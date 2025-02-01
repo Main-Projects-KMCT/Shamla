@@ -145,21 +145,23 @@
                 <div class="row gy-4 isotope-container">
                     {{#each rooms}}
                     <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-app">
-                        <img src="/images/room-images/{{this._id}}-4.png" style="border-radius: 10px;" class="img-fluid"
-                            alt="">
+                        <div class="card p-3 shadow">
+                            <img src="/images/room-images/{{this._id}}-4.png" style="border-radius: 10px;"
+                                class="img-fluid" alt="">
 
-                        <div class="portfolio-info">
-                            <h4>{{this.roomname}}</h4>
-                            <p>Check In : {{this.in}}</p>
-                            <p>Check Out : {{this.out}}</p>
+                            <div class="portfolio-info">
+                                <h4>{{this.roomname}}</h4>
+                                <p>Check In : {{this.in}}</p>
+                                <p>Check Out : {{this.out}}</p>
 
-                            <a href="/images/room-images/{{this._id}}-4.png" title="App 1"
-                                data-gallery="portfolio-gallery-app" class="glightbox preview-link"><i
-                                    class="bi bi-zoom-in"></i></a>
-                            <a href="#!" title="More Details" class="details-link"><i class="bi bi-eye"></i></a>
+                                <a href="/images/room-images/{{this._id}}-4.png" title="App 1"
+                                    data-gallery="portfolio-gallery-app" class="glightbox preview-link"><i
+                                        class="bi bi-zoom-in"></i></a>
+                                <a href="#!" title="More Details" class="details-link"><i class="bi bi-eye"></i></a>
+                            </div>
+                            <h4 class="mt-2">{{this.roomname}}</h4>
+                            <p>Rs.{{this.Price}}/-</p>
                         </div>
-                        <h4 class="mt-2">{{this.roomname}}</h4>
-                        <p>Rs.{{this.Price}}/-</p>
                     </div>
                     {{/each}}
 

@@ -9,16 +9,27 @@
     }
 </style>
 
+<style>
+    body {
+        background-image: url('/images/login.png');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-clip: content-box;
+    }
+</style>
+
 <!-- Login Wrapper Area -->
 <div class="login-wrapper d-flex  align-items-center justify-content-center">
     <div class="custom-container">
         <div class="text-center px-4"><img class="login-intro-img" src="assets/img/bg-img/36.png" alt=""></div>
         <!-- Register Form -->
-        <h4 class="text-center mb-3" style="font-weight: 600;">COSPACE<span style="color: crimson;">.</span></h4>
+        {{!-- <h4 class="text-center mb-3" style="font-weight: 600;">COSPACE<span style="color: crimson;">.</span></h4>
+        --}}
+        <br><br><br>
         <div class="card shadow p-4">
 
             <div class="register-form mt-4">
-                <h6 class="mb-4 text-center">Hey User, Welcome<br> To CoSpace</h6>
+                <h4 class="mb-4 text-center">Create New Account</h4>
                 {{#if signInErr}}
 
                 <p class="text-danger text-center ">{{signInErr}}</p>
