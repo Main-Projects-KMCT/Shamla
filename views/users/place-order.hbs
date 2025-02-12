@@ -1,3 +1,9 @@
+<style>
+    .header {
+        background-color: rgb(231, 231, 231);
+    }
+</style>
+
 <div class="page-content-wrapper py-3"><br>
     <div class="container-lg">
         <!-- Checkout Wrapper -->
@@ -5,12 +11,12 @@
             <form id="checkout-form">
                 <div class="row g-2">
                     <div class="col-lg-6">
-                        <div class="card">
+                        <div class="card shadow">
                             <div class="card-body">
 
                                 <h6 class="mb-3">Enter your billing details</h6>
                                 <input type="text" name="userId" value="{{user._id}}" hidden>
-                                <input type="hidden" name="workspaceId" value="{{workspace._id}}">
+                                <input type="hidden" name="roomId" value="{{room._id}}">
 
                                 <div class="form-group">
                                     <input class="form-control mb-3" type="text" name="Fname"
@@ -38,29 +44,64 @@
                                     <input class="form-control mb-3" type="text" name="City" value={{user.City}}
                                         placeholder="City">
                                 </div> --}}
-                                <div class="form-group">
+                                {{!-- <div class="form-group">
                                     <textarea class="form-control mb-3" id="notes" name="Address" cols="30" rows="10"
                                         placeholder="Address">{{user.Address}}</textarea>
+                                </div> --}}
+
+                            </div>
+                        </div>
+
+                        <div class="card shadow mt-2">
+                            <div class="card-body">
+
+                                <h6 class="mb-3">Addons</h6>
+                                <hr>
+
+                                <div class="form-group mb-3">
+                                    <label for="">Select Bedsheet Color</label>
+                                    <select class="form-select" name="bedsheet" aria-label="Default select example">
+                                        <option selected value="not selected" disabled>Select Color</option>
+                                        <option value="White">White</option>
+                                        <option value="Dark Gray">Dark Gray</option>
+                                        <option value="Pista Green">Pista Green</option>
+                                        <option value="Pink">Pink</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label for="">Select Extra Bed</label>
+                                    <select class="form-select" name="beds" aria-label="Default select example">
+                                        <option selected value="not selected" disabled>Select</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                    </select>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <label for="">Note</label>
+                                    <textarea class="form-control mb-3" id="notes" name="Note" cols="10" rows="2"
+                                        placeholder="Write Anything..."></textarea>
                                 </div>
 
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-6">
-                        <div class="card mb-2 p-4">
-                            <h6>Workspace Details</h6>
+                        <div class="card shadow mb-2 p-4">
+                            <h6>Room Details</h6>
                             <hr>
                             <h6>
-                                <div class="mb-2"><b>Workspace Name :</b> {{workspace.wname}}<br></div>
-                                <div class="mb-2"><b>Price :</b> {{workspace.Price}}/-<br></div>
-                                <div class="mb-2"><b>Provided By :</b> {{workspace.bname}}<br></div>
+                                <div class="mb-2"><b>Room Name :</b> {{room.roomname}}<br></div>
+                                <div class="mb-2"><b>Price :</b> {{room.Price}}/-<br></div>
                                 <hr>
-                                <div class="mb-2"><b>Total Price :</b> <span
-                                        class="text-danger">{{workspace.Price}}</span> /-<br></div>
+                                <div class="mb-2"><b>Total Price :</b> <span class="text-danger">{{room.Price}}</span>
+                                    /-<br></div>
 
                             </h6>
                         </div>
-                        <div class="card p-4">
+                        <div class="card shadow p-4">
                             <label>Select a date</label>
                             <input type="date" class="form-control" name="selecteddate" id="dateInput" required />
 

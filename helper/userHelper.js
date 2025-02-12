@@ -46,12 +46,12 @@ module.exports = {
 
 
 
-  getFeedbackByWorkspaceId: (workspaceId) => {
+  getFeedbackByRoomId: (roomId) => {
     return new Promise(async (resolve, reject) => {
       try {
         const feedbacks = await db.get()
           .collection(collections.FEEDBACK_COLLECTION)
-          .find({ workspaceId: ObjectId(workspaceId) }) // Convert workspaceId to ObjectId
+          .find({ roomId: ObjectId(roomId) }) // Convert roomId to ObjectId
           .toArray();
 
         resolve(feedbacks);
@@ -82,50 +82,50 @@ module.exports = {
 
 
 
-  ///////GET ALL workspace/////////////////////     
+  ///////GET ALL room/////////////////////     
 
-  getAllworkspaces: () => {
+  getAllrooms: () => {
     return new Promise(async (resolve, reject) => {
-      let workspaces = await db
+      let rooms = await db
         .get()
-        .collection(collections.WORKSPACE_COLLECTION)
+        .collection(collections.ROOM_COLLECTION)
         .find()
         .toArray();
-      resolve(workspaces);
+      resolve(rooms);
     });
   },
 
-  getWorkspaceById: (workspaceId) => {
+  getRoomById: (roomId) => {
     return new Promise(async (resolve, reject) => {
       try {
-        const workspace = await db.get()
-          .collection(collections.WORKSPACE_COLLECTION)
-          .findOne({ _id: ObjectId(workspaceId) }); // Convert workspaceId to ObjectId
-        resolve(workspace);
+        const room = await db.get()
+          .collection(collections.ROOM_COLLECTION)
+          .findOne({ _id: ObjectId(roomId) }); // Convert roomId to ObjectId
+        resolve(room);
       } catch (error) {
         reject(error);
       }
     });
   },
 
-  // getAllworkspaces: (staffId) => {
+  // getAllrooms: (staffId) => {
   //   return new Promise(async (resolve, reject) => {
-  //     let workspaces = await db
+  //     let rooms = await db
   //       .get()
-  //       .collection(collections.WORKSPACE_COLLECTION)
+  //       .collection(collections.ROOM_COLLECTION)
   //       .find({ staffId: objectId(staffId) }) // Filter by staffId
   //       .toArray();
-  //     resolve(workspaces);
+  //     resolve(rooms);
   //   });
   // },
 
-  /////// workspace DETAILS/////////////////////                                            
-  getworkspaceDetails: (workspaceId) => {
+  /////// room DETAILS/////////////////////                                            
+  getroomDetails: (roomId) => {
     return new Promise((resolve, reject) => {
       db.get()
-        .collection(collections.WORKSPACE_COLLECTION)
+        .collection(collections.ROOM_COLLECTION)
         .findOne({
-          _id: objectId(workspaceId)
+          _id: objectId(roomId)
         })
         .then((response) => {
           resolve(response);
@@ -301,22 +301,22 @@ module.exports = {
 
 
 
-  getWorkspaceDetails: (workspaceId) => {
+  getRoomDetails: (roomId) => {
     return new Promise((resolve, reject) => {
-      if (!ObjectId.isValid(workspaceId)) {
-        reject(new Error('Invalid workspace ID format'));
+      if (!ObjectId.isValid(roomId)) {
+        reject(new Error('Invalid room ID format'));
         return;
       }
 
       db.get()
-        .collection(collections.WORKSPACE_COLLECTION)
-        .findOne({ _id: ObjectId(workspaceId) })
-        .then((workspace) => {
-          if (!workspace) {
-            reject(new Error('Workspace not found'));
+        .collection(collections.ROOM_COLLECTION)
+        .findOne({ _id: ObjectId(roomId) })
+        .then((room) => {
+          if (!room) {
+            reject(new Error('Room not found'));
           } else {
-            // Assuming the workspace has a staffId field
-            resolve(workspace);
+            // Assuming the room has a staffId field
+            resolve(room);
           }
         })
         .catch((err) => {
@@ -328,24 +328,24 @@ module.exports = {
 
 
 
-  placeOrder: (order, workspace, total, user) => {
+  placeOrder: (order, room, total, user) => {
     return new Promise(async (resolve, reject) => {
       try {
-        console.log(order, workspace, total);
+        console.log(order, room, total);
         let status = order["payment-method"] === "COD" ? "placed" : "pending";
 
-        // Get the workspace document to check the current seat value
-        const workspaceDoc = await db.get()
-          .collection(collections.WORKSPACE_COLLECTION)
-          .findOne({ _id: objectId(workspace._id) });
+        // Get the room document to check the current seat value
+        const roomDoc = await db.get()
+          .collection(collections.ROOM_COLLECTION)
+          .findOne({ _id: objectId(room._id) });
 
-        // Check if the workspace exists and the seat field is present
-        if (!workspaceDoc || !workspaceDoc.seat) {
-          return reject(new Error("Workspace not found or seat field is missing."));
+        // Check if the room exists and the seat field is present
+        if (!roomDoc || !roomDoc.seat) {
+          return reject(new Error("Room not found or seat field is missing."));
         }
 
         // Convert seat from string to number and check availability
-        let seatCount = Number(workspaceDoc.seat);
+        let seatCount = Number(roomDoc.seat);
         if (isNaN(seatCount) || seatCount <= 0) {
           return reject(new Error("Seat is not available."));
         }
@@ -362,15 +362,20 @@ module.exports = {
             State: order.State,
             Pincode: order.Pincode,
             selecteddate: order.selecteddate,
+            bedsheet: order.bedsheet,
+            beds: order.beds,
+            Note: order.Note,
+
+
           },
           userId: objectId(order.userId),
           user: user,
           paymentMethod: order["payment-method"],
-          workspace: workspace,
+          room: room,
           totalAmount: total,
           status: status,
           date: new Date(),
-          staffId: workspace.staffId, // Store the staff's ID
+          staffId: room.staffId, // Store the staff's ID
         };
 
         // Insert the order into the database
@@ -381,11 +386,11 @@ module.exports = {
         // Decrement the seat count
         seatCount -= 1; // Decrement the seat count
 
-        // Convert back to string and update the workspace seat count
+        // Convert back to string and update the room seat count
         await db.get()
-          .collection(collections.WORKSPACE_COLLECTION)
+          .collection(collections.ROOM_COLLECTION)
           .updateOne(
-            { _id: objectId(workspace._id) },
+            { _id: objectId(room._id) },
             { $set: { seat: seatCount.toString() } } // Convert number back to string
           );
 
@@ -414,10 +419,10 @@ module.exports = {
     });
   },
 
-  getOrderWorkspaces: (orderId) => {
+  getOrderRooms: (orderId) => {
     return new Promise(async (resolve, reject) => {
       try {
-        let workspaces = await db
+        let rooms = await db
           .get()
           .collection(collections.ORDER_COLLECTION)
           .aggregate([
@@ -426,8 +431,8 @@ module.exports = {
             },
             {
               $project: {
-                // Include workspace, user, and other relevant fields
-                workspace: 1,
+                // Include room, user, and other relevant fields
+                room: 1,
                 user: 1,
                 paymentMethod: 1,
                 totalAmount: 1,
@@ -440,7 +445,7 @@ module.exports = {
           ])
           .toArray();
 
-        resolve(workspaces[0]); // Fetch the first (and likely only) order matching this ID
+        resolve(rooms[0]); // Fetch the first (and likely only) order matching this ID
       } catch (error) {
         reject(error);
       }

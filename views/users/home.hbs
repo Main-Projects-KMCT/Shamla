@@ -142,33 +142,105 @@
                     <li data-filter=".filter-books">Books</li>
                 </ul> --}}
 
-                <div class="row gy-4 isotope-container">
+                <div class="row g-3 ">
+                    <!-- Single Top Product Card -->
                     {{#each rooms}}
-                    <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-app">
-                        <div class="card p-3 shadow">
-                            <img src="/images/room-images/{{this._id}}-4.png" style="border-radius: 10px;"
-                                class="img-fluid" alt="">
+                    <div class="col-6 col-sm-4 col-lg-4">
+                        <a href="/single-room/{{this._id}}">
+                            <div class="card single-product-card">
+                                <div class="card-body shadow p-3">
+                                    <!-- Product Thumbnail -->
+                                    <a class="product-thumbnail d-block" href="#!">
+                                        <img src="/images/room-images/{{this._id}}-4.png" width="100%" alt=""
+                                            style="border-radius: 10px;">
+                                        <!-- Badge -->
+                                    </a>
+                                    <!-- Product Title -->
+                                    <div class="mt-3">
+                                        <!-- Product Price -->
+                                        <h4>{{this.roomname}}</h4>
+                                        <div class="d-flex gap-4 mb-0">
+                                            <p>Check In : {{this.in}}</p>
+                                            <p>Check Out : {{this.out}}</p>
+                                        </div>
 
-                            <div class="portfolio-info">
-                                <h4>{{this.roomname}}</h4>
-                                <p>Check In : {{this.in}}</p>
-                                <p>Check Out : {{this.out}}</p>
 
-                                <a href="/images/room-images/{{this._id}}-4.png" title="App 1"
-                                    data-gallery="portfolio-gallery-app" class="glightbox preview-link"><i
-                                        class="bi bi-zoom-in"></i></a>
-                                <a href="#!" title="More Details" class="details-link"><i class="bi bi-eye"></i></a>
+                                        <h5 class="mt-0 mb-3 text-success">Rs.{{this.Price}}/-</h5>
+
+                                        <a href="/single-room/{{this._id}}"
+                                            class="ct-btn btn btn2 btn-sm w-100 btn-outline-dark d-none d-md-inline-block">View
+                                            Details</a>
+
+                                        <button class="btn btn-creative w-100 mt-2 btn-dark btn-sm ct-btn buy-now"
+                                            data-id="{{this._id}}" data-seats="{{this.seat}}">Buy Now</button>
+                                    </div>
+                                </div>
                             </div>
-                            <h4 class="mt-2">{{this.roomname}}</h4>
-                            <p>Rs.{{this.Price}}/-</p>
-                        </div>
+                        </a>
                     </div>
                     {{/each}}
 
 
-                </div><!-- End Portfolio Container -->
 
+
+                </div>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const buyNowButtons = document.querySelectorAll('.buy-now');
+
+                        buyNowButtons.forEach(button => {
+                            const seatsAvailable = parseInt(button.getAttribute('data-seats'), 10);
+
+                            if (seatsAvailable === 0) {
+                                button.disabled = true; // Disable the button if sold out
+                                button.textContent = 'Sold Out'; // Change the button text
+                                button.classList.add('disabled'); // Optionally add a disabled class for styling
+                            } else {
+                                button.addEventListener('click', function () {
+                                    buyNow(button.getAttribute('data-id')); // Call the buyNow function
+                                });
+                            }
+                        });
+                    });
+
+                    function buyNow(roomId) {
+                        // Your buy now logic here, for example:
+                        alert('Buying room with ID: ' + roomId);
+                        // Implement your purchase logic (e.g., make an API call)
+                    }
+                </script>
+
+                <script>
+                    function elementsSearch() {
+                        var input = document.getElementById('elementsSearchInput');
+                        var filter = input.value.toUpperCase();
+                        var list = document.getElementById("elementsSearchList");
+                        var listItem = list.getElementsByClassName('col-6');
+
+                        for (i = 0; i < listItem.length; i++) {
+                            var a = listItem[i];
+                            var textValue = a.textContent || a.innerText;
+                            if (textValue.toUpperCase().indexOf(filter) > -1) {
+                                listItem[i].style.display = "";
+                            } else {
+                                listItem[i].style.display = "none";
+                            }
+                        }
+                    }
+
+                </script>
+                <script>
+                    function buyNow(roomId) {
+                        window.location.href = '/place-order/' + roomId;
+                    }
+
+                </script>
             </div>
+            <br><br><br>
+            <center><a href="/all-rooms" class="btn btn-dark">View All Rooms</a></center>
+
+        </div>
 
         </div>
 

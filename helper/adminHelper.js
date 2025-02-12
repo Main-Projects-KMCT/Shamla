@@ -191,6 +191,7 @@ module.exports = {
     // Add createdAt field with the current timestamp
     room.createdAt = new Date();
     room.Price = parseInt(room.Price);
+    room.seat = 1;
 
     console.log(room);
     db.get()

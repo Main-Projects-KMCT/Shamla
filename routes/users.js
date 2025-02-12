@@ -24,6 +24,15 @@ router.get("/", async function (req, res, next) {
 });
 
 
+router.get("/all-rooms", async function (req, res, next) {
+  let user = req.session.user;
+  adminHelper.getAllrooms().then((rooms) => {
+    res.render("users/all-rooms", { admin: false, rooms, user });
+  });
+});
+
+
+
 router.get("/notifications", verifySignedIn, function (req, res) {
   let user = req.session.user;  // Get logged-in user from session
 
@@ -54,7 +63,7 @@ router.post("/add-feedback", async function (req, res) {
   let user = req.session.user; // Ensure the user is logged in and the session is set
   let feedbackText = req.body.text; // Get feedback text from form input
   let username = req.body.username; // Get username from form input
-  let workspaceId = req.body.workspaceId; // Get workspace ID from form input
+  let roomId = req.body.roomId; // Get room ID from form input
   let staffId = req.body.staffId; // Get staff ID from form input
 
   if (!user) {
@@ -64,7 +73,7 @@ router.post("/add-feedback", async function (req, res) {
   try {
     const feedback = {
       userId: ObjectId(user._id), // Convert user ID to ObjectId
-      workspaceId: ObjectId(workspaceId), // Convert workspace ID to ObjectId
+      roomId: ObjectId(roomId), // Convert room ID to ObjectId
       staffId: ObjectId(staffId), // Convert staff ID to ObjectId
       text: feedbackText,
       username: username,
@@ -72,7 +81,7 @@ router.post("/add-feedback", async function (req, res) {
     };
 
     await userHelper.addFeedback(feedback);
-    res.redirect("/single-workspace/" + workspaceId); // Redirect back to the workspace page
+    res.redirect("/single-room/" + roomId); // Redirect back to the room page
   } catch (error) {
     console.error("Error adding feedback:", error);
     res.status(500).send("Server Error");
@@ -81,26 +90,26 @@ router.post("/add-feedback", async function (req, res) {
 
 
 
-router.get("/single-workspace/:id", async function (req, res) {
+router.get("/single-room/:id", async function (req, res) {
   let user = req.session.user;
-  const workspaceId = req.params.id;
+  const roomId = req.params.id;
 
   try {
-    const workspace = await userHelper.getWorkspaceById(workspaceId);
+    const room = await userHelper.getRoomById(roomId);
 
-    if (!workspace) {
-      return res.status(404).send("Workspace not found");
+    if (!room) {
+      return res.status(404).send("Room not found");
     }
-    const feedbacks = await userHelper.getFeedbackByWorkspaceId(workspaceId); // Fetch feedbacks for the specific workspace
+    const feedbacks = await userHelper.getFeedbackByRoomId(roomId); // Fetch feedbacks for the specific room
 
-    res.render("users/single-workspace", {
+    res.render("users/single-room", {
       admin: false,
       user,
-      workspace,
+      room,
       feedbacks
     });
   } catch (error) {
-    console.error("Error fetching workspace:", error);
+    console.error("Error fetching room:", error);
     res.status(500).send("Server Error");
   }
 });
@@ -355,37 +364,37 @@ router.post("/edit-profile/:id", verifySignedIn, async function (req, res) {
 
 
 router.get('/place-order/:id', verifySignedIn, async (req, res) => {
-  const workspaceId = req.params.id;
+  const roomId = req.params.id;
 
-  // Validate the workspace ID
-  if (!ObjectId.isValid(workspaceId)) {
-    return res.status(400).send('Invalid workspace ID format');
+  // Validate the room ID
+  if (!ObjectId.isValid(roomId)) {
+    return res.status(400).send('Invalid room ID format');
   }
 
   let user = req.session.user;
 
   // Fetch the product details by ID
-  let workspace = await userHelper.getWorkspaceDetails(workspaceId);
+  let room = await userHelper.getRoomDetails(roomId);
 
-  // If no workspace is found, handle the error
-  if (!workspace) {
-    return res.status(404).send('Workspace not found');
+  // If no room is found, handle the error
+  if (!room) {
+    return res.status(404).send('Room not found');
   }
 
-  // Render the place-order page with workspace details
-  res.render('users/place-order', { user, workspace });
+  // Render the place-order page with room details
+  res.render('users/place-order', { user, room });
 });
 
 router.post('/place-order', async (req, res) => {
   let user = req.session.user;
-  let workspaceId = req.body.workspaceId;
+  let roomId = req.body.roomId;
 
-  // Fetch workspace details
-  let workspace = await userHelper.getWorkspaceDetails(workspaceId);
-  let totalPrice = workspace.Price; // Get the price from the workspace
+  // Fetch room details
+  let room = await userHelper.getRoomDetails(roomId);
+  let totalPrice = room.Price; // Get the price from the room
 
   // Call placeOrder function
-  userHelper.placeOrder(req.body, workspace, totalPrice, user)
+  userHelper.placeOrder(req.body, room, totalPrice, user)
     .then((orderId) => {
       if (req.body["payment-method"] === "COD") {
         res.json({ codSuccess: true });
@@ -432,7 +441,7 @@ router.get("/orders", verifySignedIn, async function (req, res) {
   res.render("users/orders", { admin: false, user, orders });
 });
 
-router.get("/view-ordered-workspaces/:id", verifySignedIn, async function (req, res) {
+router.get("/view-ordered-rooms/:id", verifySignedIn, async function (req, res) {
   let user = req.session.user;
   let orderId = req.params.id;
 
@@ -446,14 +455,14 @@ router.get("/view-ordered-workspaces/:id", verifySignedIn, async function (req, 
   }
 
   try {
-    let workspaces = await userHelper.getOrderWorkspaces(orderId);
-    res.render("users/order-workspaces", {
+    let rooms = await userHelper.getOrderRooms(orderId);
+    res.render("users/order-rooms", {
       admin: false,
       user,
-      workspaces,
+      rooms,
     });
   } catch (err) {
-    console.error('Error fetching ordered workspaces:', err);
+    console.error('Error fetching ordered rooms:', err);
     res.status(500).send('Internal Server Error');
   }
 });
