@@ -79,7 +79,7 @@
 
                                             <p class="mb-0"><b>Check in : </b>{{this.in}}</p>
 
-                                            <p class="mb-0"><b> Check out : </b>{{this.out}}/-</p>
+                                            <p class="mb-0"><b> Check out : </b>{{this.out}}</p>
 
                                         </td>
                                         <td>{{this.ren}}</td>
@@ -87,15 +87,12 @@
                                         <td>
                                             <div class="d-flex gap-2">
 
-                                                <form action="/admin/staffs/delete-staff/{{this._id}}" method="POST">
-                                                    <button type="submit"
-                                                        onclick="return confirm('Are You Sure to Delete This Staff ?')"
-                                                        class="btn btn-dark btn-sm"><i class="bi bi-pen"></i></button>
-                                                </form>
+                                                <a href="/admin/rooms/edit-room/{{this._id}}"
+                                                    class="btn btn-dark btn-sm"><i class="bi bi-pen"></i></a>
 
                                                 <form action="/admin/rooms/delete-room/{{this._id}}" method="POST">
                                                     <button type="submit"
-                                                        onclick="return confirm('Are You Sure to Delete This Staff ?')"
+                                                        onclick="return confirm('Are You Sure to Delete This Room ?')"
                                                         class="btn btn-danger btn-sm"><i
                                                             class="bi bi-trash"></i></button>
                                                 </form>
