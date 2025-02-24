@@ -391,15 +391,25 @@ router.post('/place-order', async (req, res) => {
 
   // Fetch room details
   let room = await userHelper.getRoomDetails(roomId);
-  let totalPrice = room.Price; // Get the price from the room
+  if (!room) {
+    return res.status(404).send("Room not found");
+  }
+
+  let totalPrice = room.Price; // Default: Full price
+  let advanceAmount = room.AdvPrice; // Advance payment amount
+  let selectedPaymentMethod = req.body["payment-method"];
+
+  // Determine the amount to charge based on the payment method
+  let paymentAmount = selectedPaymentMethod === "ADVANCE" ? advanceAmount : totalPrice;
 
   // Call placeOrder function
-  userHelper.placeOrder(req.body, room, totalPrice, user)
+  userHelper.placeOrder(req.body, room, paymentAmount, user)
     .then((orderId) => {
-      if (req.body["payment-method"] === "COD") {
+      if (selectedPaymentMethod === "COD") {
         res.json({ codSuccess: true });
       } else {
-        userHelper.generateRazorpay(orderId, totalPrice).then((response) => {
+        // Pass the correct amount to Razorpay (Advance or Full)
+        userHelper.generateRazorpay(orderId, paymentAmount).then((response) => {
           res.json(response);
         });
       }
@@ -412,12 +422,15 @@ router.post('/place-order', async (req, res) => {
 
 
 
+
 router.post("/verify-payment", async (req, res) => {
   console.log(req.body);
+
   userHelper
     .verifyPayment(req.body)
     .then(() => {
-      userHelper.changePaymentStatus(req.body["order[receipt]"]).then(() => {
+      // Ensure the correct order ID is updated
+      userHelper.changePaymentStatus(req.body["order[receipt]"], req.body.amountPaid).then(() => {
         res.json({ status: true });
       });
     })
@@ -425,6 +438,7 @@ router.post("/verify-payment", async (req, res) => {
       res.json({ status: false, errMsg: "Payment Failed" });
     });
 });
+
 
 router.get("/order-placed", verifySignedIn, async (req, res) => {
   let user = req.session.user;

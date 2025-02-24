@@ -97,7 +97,11 @@
                                 <div class="mb-2"><b>Price :</b> {{room.Price}}/-<br></div>
                                 <hr>
                                 <div class="mb-2"><b>Total Price :</b> <span class="text-danger">{{room.Price}}</span>
-                                    /-<br></div>
+                                    /-<br>
+
+                                    <div class="mb-2"><b>Advance Amount :</b> <span
+                                            class="text-danger">{{room.AdvPrice}}/-</span>
+                                    </div>
 
                             </h6>
                         </div>
@@ -120,6 +124,12 @@
                                 <label class="form-check-label" for="darkRadio2">Pay & Book</label>
                             </div>
 
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" name="payment-method" value="ADVANCE">
+                                <label class="form-check-label" for="darkRadio2">Pay Advance
+                                    ({{room.AdvPrice}}/-)</label>
+                            </div>
+
                             <button class="btn btn-dark mt-3 w-100" type="submit">Book Now</button>
             </form>
         </div>
@@ -134,75 +144,85 @@
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <script>
-    // Your script that uses jQuery
-    $("#checkout-form").submit((e) => {
-        console.log($("#checkout-form")); // Check if this returns a valid jQuery object
-        e.preventDefault();
-        $.ajax({
-            url: '/place-order',
-            method: 'post',
-            data: $("#checkout-form").serialize(),
-            success: (response) => {
-                if (response.codSuccess) {
-                    location.href = '/order-placed';
-                } else {
-                    razorpayPayment(response);
-                }
-            },
-            error: (xhr, status, error) => {
-                console.error("Error placing order:", xhr.responseText);
-                alert("An error occurred while placing the order. Please try again.");
-            }
-        });
-    });
+$("#checkout-form").submit((e) => {
+    e.preventDefault();
 
-</script>
-<script>
-    function razorpayPayment(order) {
-        var options = {
-            "key": "rzp_test_8NokNgt8cA3Hdv", // Enter the Key ID generated from the Dashboard
-            "amount": order.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
-            "currency": "INR",
-            "name": "CoSpace",
-            "description": "Test Transaction",
-            "image": "https://example.com/your_logo",
-            "order_id": order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
-            "handler": function (response) {
-                verifyPayment(response, order)
-            },
-            "prefill": {
-                "name": "Shahala nushri",
-                "email": "shahalanushri9@gmail.com",
-                "contact": "8156867466"
-            },
-            "notes": {
-                "address": "Razorpay Corporate Office"
-            },
-            "theme": {
-                "color": "#3399cc"
+    let selectedPaymentMethod = $("input[name='payment-method']:checked").val();
+    let advanceAmount = {{room.AdvPrice}}; // Get advance amount from template
+    let totalAmount = {{room.Price}}; // Get total price from template
+    let paymentAmount = selectedPaymentMethod === "ADVANCE" ? advanceAmount : totalAmount;
+
+    $.ajax({
+        url: '/place-order',
+        method: 'post',
+        data: $("#checkout-form").serialize(),
+        success: (response) => {
+            if (response.codSuccess) {
+                location.href = '/order-placed';
+            } else {
+                // Pass the correct amount to Razorpay
+                razorpayPayment(response, paymentAmount);
+            }
+        },
+        error: (xhr, status, error) => {
+            console.error("Error placing order:", xhr.responseText);
+            alert("An error occurred while placing the order. Please try again.");
+        }
+    });
+});
+
+
+function razorpayPayment(order, paymentAmount) {
+    var options = {
+        "key": "rzp_test_8NokNgt8cA3Hdv", // Your Razorpay Key
+        "amount": paymentAmount * 100, // Convert amount to paise (₹4000 → 400000 paise)
+        "currency": "INR",
+        "name": "Ginberry",
+        "description": "Room Booking Payment",
+        "image": "https://example.com/your_logo",
+        "order_id": order.id, // Razorpay order ID
+        "handler": function (response) {
+            verifyPayment(response, order, paymentAmount);
+        },
+        "prefill": {
+            "name": "{{user.Fname}} {{user.Lname}}",
+            "email": "{{user.Email}}",
+            "contact": "{{user.Phone}}"
+        },
+        "notes": {
+            "paymentType": "Booking Payment",
+            "selectedAmount": paymentAmount
+        },
+        "theme": {
+            "color": "#3399cc"
+        }
+    };
+
+    var rzp1 = new Razorpay(options);
+    rzp1.open();
+}
+
+
+function verifyPayment(payment, order, amountPaid) {
+    $.ajax({
+        url: '/verify-payment',
+        data: {
+            payment,
+            order,
+            amountPaid // Send the correct paid amount to the backend
+        },
+        method: 'post',
+        success: (response) => {
+            if (response.status) {
+                location.href = '/order-placed';
+            } else {
+                alert("Payment verification failed.");
             }
         }
-        var rzp1 = new Razorpay(options);
-        rzp1.open()
-    }
+    });
+}
 
-    function verifyPayment(payment, order) {
-        $.ajax({
-            url: '/verify-payment',
-            data: {
-                payment,
-                order
-            },
-            method: 'post',
-            success: (response) => {
-                if (response.status) {
-                    location.href = '/order-placed'
-                } else {
-                    alert("Payment failed")
-                }
-            }
-        })
-    }
+
 </script>
 
 <script>

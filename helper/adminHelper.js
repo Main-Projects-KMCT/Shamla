@@ -268,6 +268,8 @@ module.exports = {
               ren: roomDetails.ren,
               desc: roomDetails.desc,
               fesilities: roomDetails.fesilities,
+              AdvPrice: roomDetails.AdvPrice,
+
 
             },
           }

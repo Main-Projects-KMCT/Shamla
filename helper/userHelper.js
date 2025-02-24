@@ -350,6 +350,9 @@ module.exports = {
           return reject(new Error("Seat is not available."));
         }
 
+        // Handle Advance Payment
+        let paymentAmount = order["payment-method"] === "ADVANCE" ? room.AdvPrice : total;
+
         // Create the order object
         let orderObject = {
           deliveryDetails: {
@@ -365,14 +368,13 @@ module.exports = {
             bedsheet: order.bedsheet,
             beds: order.beds,
             Note: order.Note,
-
-
           },
           userId: objectId(order.userId),
           user: user,
           paymentMethod: order["payment-method"],
           room: room,
-          totalAmount: total,
+          totalAmount: paymentAmount,  // Stores either Full or Advance Amount
+          fullAmount: total, // Stores full price for later reference
           status: status,
           date: new Date(),
           staffId: room.staffId, // Store the staff's ID
@@ -394,7 +396,7 @@ module.exports = {
             { $set: { seat: seatCount.toString() } } // Convert number back to string
           );
 
-        resolve(response.ops[0]._id);
+        resolve(response.insertedId); // Fixed: Return order ID properly
       } catch (error) {
         console.error("Error placing order:", error);
         reject(error);
@@ -452,16 +454,20 @@ module.exports = {
     });
   },
 
-  generateRazorpay: (orderId, totalPrice) => {
+  generateRazorpay: (orderId, amount) => {
     return new Promise((resolve, reject) => {
       var options = {
-        amount: totalPrice * 100, // amount in the smallest currency unit
+        amount: amount * 100, // Convert to paise
         currency: "INR",
         receipt: "" + orderId,
       };
       instance.orders.create(options, function (err, order) {
-        console.log("New Order : ", order);
-        resolve(order);
+        if (err) {
+          reject(err);
+        } else {
+          console.log("New Razorpay Order: ", order);
+          resolve(order);
+        }
       });
     });
   },
@@ -494,26 +500,70 @@ module.exports = {
           { _id: objectId(orderId) },
           {
             $set: {
-              "orderObject.status": "placed",
+              status: "placed",  // Fixed: Correctly updates status
             },
           }
         )
         .then(() => {
           resolve();
+        })
+        .catch((err) => {
+          reject(err);
         });
     });
   },
 
+
   cancelOrder: (orderId) => {
     return new Promise(async (resolve, reject) => {
-      db.get()
-        .collection(collections.ORDER_COLLECTION)
-        .removeOne({ _id: objectId(orderId) })
-        .then(() => {
-          resolve();
-        });
+      try {
+        // Fetch the order details before deletion
+        const order = await db.get()
+          .collection(collections.ORDER_COLLECTION)
+          .findOne({ _id: objectId(orderId) });
+
+        if (!order) {
+          return reject(new Error("Order not found."));
+        }
+
+        const roomId = order.room._id; // Get the room ID
+
+        // Get the room details
+        const room = await db.get()
+          .collection(collections.ROOM_COLLECTION)
+          .findOne({ _id: objectId(roomId) });
+
+        if (!room) {
+          return reject(new Error("Room not found."));
+        }
+
+        // Convert seat from string to number and increment it
+        let seatCount = Number(room.seat);
+        if (isNaN(seatCount)) seatCount = 0;
+
+        seatCount += 1; // Increment seat count
+
+        // Update the seat count in ROOM_COLLECTION
+        await db.get()
+          .collection(collections.ROOM_COLLECTION)
+          .updateOne(
+            { _id: objectId(roomId) },
+            { $set: { seat: seatCount.toString() } } // Convert back to string
+          );
+
+        // Delete the order after updating the seat count
+        await db.get()
+          .collection(collections.ORDER_COLLECTION)
+          .deleteOne({ _id: objectId(orderId) });
+
+        resolve();
+      } catch (error) {
+        console.error("Error canceling order:", error);
+        reject(error);
+      }
     });
   },
+
 
   searchProduct: (details) => {
     console.log(details);
