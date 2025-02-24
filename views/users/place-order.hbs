@@ -171,36 +171,35 @@ $("#checkout-form").submit((e) => {
     });
 });
 
-
-function razorpayPayment(order, paymentAmount) {
-    var options = {
-        "key": "rzp_test_8NokNgt8cA3Hdv", // Your Razorpay Key
-        "amount": paymentAmount * 100, // Convert amount to paise (₹4000 → 400000 paise)
-        "currency": "INR",
-        "name": "Ginberry",
-        "description": "Room Booking Payment",
-        "image": "https://example.com/your_logo",
-        "order_id": order.id, // Razorpay order ID
-        "handler": function (response) {
-            verifyPayment(response, order, paymentAmount);
-        },
-        "prefill": {
-            "name": "{{user.Fname}} {{user.Lname}}",
-            "email": "{{user.Email}}",
-            "contact": "{{user.Phone}}"
-        },
-        "notes": {
-            "paymentType": "Booking Payment",
-            "selectedAmount": paymentAmount
-        },
-        "theme": {
-            "color": "#3399cc"
+</script>
+<script>
+    function razorpayPayment(order) {
+        var options = {
+            "key": "rzp_test_8NokNgt8cA3Hdv", // Enter the Key ID generated from the Dashboard
+            "amount": order.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+            "currency": "INR",
+            "name": "CoSpace",
+            "description": "Test Transaction",
+            "image": "https://example.com/your_logo",
+            "order_id": order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+            "handler": function (response) {
+                verifyPayment(response, order)
+            },
+            "prefill": {
+                "name": "Shahala nushri",
+                "email": "shahalanushri9@gmail.com",
+                "contact": "8156867466"
+            },
+            "notes": {
+                "address": "Razorpay Corporate Office"
+            },
+            "theme": {
+                "color": "#3399cc"
+            }
         }
-    };
-
-    var rzp1 = new Razorpay(options);
-    rzp1.open();
-}
+        var rzp1 = new Razorpay(options);
+        rzp1.open()
+    }
 
 
 function verifyPayment(payment, order, amountPaid) {

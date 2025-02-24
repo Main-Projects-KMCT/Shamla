@@ -31,7 +31,7 @@
                             {{!-- <a class="btn btn-dark btn-sm" href="/view-ordered-rooms/{{this._id}}">
                                 View Details</a> --}}
                             <a href="/cancel-order/{{this._id}}"
-                                onclick="return confirm('Are You Sure to Delete {{this.roomname}} ?')"
+                                onclick="return confirm('Are You Sure to cancel {{this.roomname}} ?')"
                                 class="btn btn-danger btn-sm">
                                 Cancel Booking
                             </a>
@@ -60,7 +60,7 @@
 <script>
     function canelorder(id) {
         Swal.fire({
-            title: `Are you sure to cancel this order?`,
+            title: `Are you sure to cancel this Booking?`,
             text: '',
             icon: 'warning',
             showCancelButton: true,
