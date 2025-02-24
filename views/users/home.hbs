@@ -5,58 +5,78 @@
 
         <div id="hero-carousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="5000">
 
-            <div class="carousel-item active">
-                <img src="/assets2/img/hero-carousel/room.png" alt="">
-                <div class="container">
-                    <h2>Luxuriate In Comfort</h2>
-                    <p>Experience the Best of Resort Living </p>
-                    <a href="#featured-services" class="btn-get-started">Get Started</a>
-                </div>
-            </div><!-- End Carousel Item -->
+            <!-- Indicators -->
+            <ol class="carousel-indicators">
+                <li data-bs-target="#hero-carousel" data-bs-slide-to="0" class="active"></li>
+                <li data-bs-target="#hero-carousel" data-bs-slide-to="1"></li>
+                <li data-bs-target="#hero-carousel" data-bs-slide-to="2"></li>
+                <li data-bs-target="#hero-carousel" data-bs-slide-to="3"></li>
+            </ol>
 
-            <div class="carousel-item">
-                <img src="/assets2/img/hero-carousel/ginberry.png" alt="">
-                <div class="container">
-                    <h2>Escap tp Paradise</h2>
-                    <p>Your Ultimate Resort Experience Awaits.</p>
-                    <a href="#featured-services" class="btn-get-started">Get Started</a>
+            <!-- Carousel Inner -->
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <img src="/assets2/img/hero-carousel/room.png" class="d-block w-100" alt="Room">
+                    <div class="carousel-caption">
+                        <h2>Luxuriate In Comfort</h2>
+                        <p>Experience the Best of Resort Living</p>
+                        <a href="#featured-services" class="btn-get-started">Get Started</a>
+                    </div>
                 </div>
-            </div><!-- End Carousel Item -->
 
-            <div class="carousel-item">
-                <img src="/assets2/img/hero-carousel/hero-carousel-3.jpg" alt="">
-                <div class="container">
-                    <h2>Temporibus autem quibusdam</h2>
-                    <p>Beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut
-                        odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt
-                        omnis iste natus error sit voluptatem accusantium.</p>
-                    <a href="#featured-services" class="btn-get-started">Get Started</a>
+                <div class="carousel-item">
+                    <img src="/assets2/img/hero-carousel/ginberry.png" class="d-block w-100" alt="Ginberry">
+                    <div class="carousel-caption">
+                        <h2>Escape to Paradise</h2>
+                        <p>Your Ultimate Resort Experience Awaits.</p>
+                        <a href="#featured-services" class="btn-get-started">Get Started</a>
+                    </div>
                 </div>
-            </div><!-- End Carousel Item -->
 
-             <div class="carousel-item">
-                <img src="/assets2/img/hero-carousel/nightresort.png" alt="">
-                <div class="container">
-                    <h2>Where Dreams Come True</h2>
-                    <p>Welcome to Our Stunning Resort Retreat
-                    </p>
-                    <a href="#featured-services" class="btn-get-started">Get Started</a>
+                <div class="carousel-item">
+                    <img src="/assets2/img/hero-carousel/hero-carousel-3.jpg" class="d-block w-100"
+                        alt="Carousel Image">
+                    <div class="carousel-caption">
+                        <h2>Temporibus autem quibusdam</h2>
+                        <p>Beatae vitae dicta sunt explicabo...</p>
+                        <a href="#featured-services" class="btn-get-started">Get Started</a>
+                    </div>
+                </div>
+
+                <div class="carousel-item">
+                    <img src="/assets2/img/hero-carousel/nightresort.png" class="d-block w-100" alt="Night Resort">
+                    <div class="carousel-caption">
+                        <h2>Where Dreams Come True</h2>
+                        <p>Welcome to Our Stunning Resort Retreat</p>
+                        <a href="#featured-services" class="btn-get-started">Get Started</a>
+                    </div>
                 </div>
             </div>
 
+            <!-- Controls -->
             <a class="carousel-control-prev" href="#hero-carousel" role="button" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon bi bi-chevron-left" aria-hidden="true"></span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="36   " height="36   " fill="currentColor"
+                    class="bi bi-arrow-left-circle" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd"
+                        d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8m15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-4.5-.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z" />
+                </svg>
+                <span class="visually-hidden">Previous</span>
             </a>
-
             <a class="carousel-control-next" href="#hero-carousel" role="button" data-bs-slide="next">
-                <span class="carousel-control-next-icon bi bi-chevron-right" aria-hidden="true"></span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="currentColor"
+                    class="bi bi-arrow-right-circle" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd"
+                        d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8m15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0M4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5z" />
+                </svg>
+                <span class="visually-hidden">Next</span>
             </a>
-
-            <ol class="carousel-indicators"></ol>
-
         </div>
 
-    </section><!-- /Hero Section -->
+    </section>
+
+
+
+
 
     <!-- Call To Action Section -->
     <section id="call-to-action" class="call-to-action section light-background">
@@ -67,8 +87,12 @@
                 <div class="col-xl-9 text-center text-xl-start">
                     <h3>Discover Tranquility, Embrace Luxury<br>Your Retreat Awaits at</h3>
                     <h2 style="color: rgb(7, 227, 91);">Ginberry Holidays</h2>
-                    <p>Ginberry Holidays is a newly launched premium resort nestled near the captivating Muthanga Wildlife Sanctuary.<br>
-                     Situated amidst the serene beauty of nature, Ginberry Holidays offers a haven of relaxation and adventure for gu<br>ests of all ages. Ginberry is a wheelchair-accessible family resort, which makes it suitable for guests of all abiliti<br>es. Our dedicated staff ensure the highest standards of hospitality.</p>
+                    <p>Ginberry Holidays is a newly launched premium resort nestled near the captivating Muthanga
+                        Wildlife Sanctuary.<br>
+                        Situated amidst the serene beauty of nature, Ginberry Holidays offers a haven of relaxation and
+                        adventure for gu<br>ests of all ages. Ginberry is a wheelchair-accessible family resort, which
+                        makes it suitable for guests of all abiliti<br>es. Our dedicated staff ensure the highest
+                        standards of hospitality.</p>
                 </div>
                 <div class="col-xl-3 cta-btn-container text-center">
                     <h6>Looking for joyful family holidays experiences at a luxurious destination ?</h6>
@@ -95,7 +119,12 @@
                         <a href="#" class="stretched-link">
                             <h3>Boat House</h3>
                         </a>
-                        <p>This full air conditioned stand alone villa is constructed completely modelled on Alappuzha House boats. To m<br>ake it more organic and nature friendly interior is done <br>with original bamboo ply. It consists of two spacious a<br>nd luxurious bed rooms seperated by living hall. Each b<br>ed room has balcony shaped as a bow. Starboard of bo<br>th bedrooms face vast paddy field. Ginberry has two bo<br>at houses that situate on the mini hillock.</p>
+                        <p>This full air conditioned stand alone villa is constructed completely modelled on Alappuzha
+                            House boats. To m<br>ake it more organic and nature friendly interior is done <br>with
+                            original bamboo ply. It consists of two spacious a<br>nd luxurious bed rooms seperated by
+                            living hall. Each b<br>ed room has balcony shaped as a bow. Starboard of bo<br>th bedrooms
+                            face vast paddy field. Ginberry has two bo<br>at houses that situate on the mini hillock.
+                        </p>
                     </div>
                 </div>
 
@@ -108,10 +137,12 @@
                             <h3>Igloo Cave</h3>
                         </a>
                         <p>This fully air-conditioned stand-alone villa is in the shape of a cave.
-                             The rocky interior provides a unique cave-dwe<br>lling experience. 
-                             It has an attic bedspace that provides a<br>n enchanting and holistic view of the Ginberry panorama.
-                              This single-bedroom villa is spread over 537 sq. ft. area, in addition to the cave opening and washroom area. 
-                              It is specially designed for honeymooners. Ginberry has three igloo caves.</p>
+                            The rocky interior provides a unique cave-dwe<br>lling experience.
+                            It has an attic bedspace that provides a<br>n enchanting and holistic view of the Ginberry
+                            panorama.
+                            This single-bedroom villa is spread over 537 sq. ft. area, in addition to the cave opening
+                            and washroom area.
+                            It is specially designed for honeymooners. Ginberry has three igloo caves.</p>
                     </div>
                 </div>
 
@@ -124,8 +155,9 @@
                             <h3>Private Pool Villa</h3>
                         </a>
                         <p>Experience the ultimate in privacy and romance with Ginberry’s exclusive private pool villas.
-                              Immerse yourself in your secluded pool, surrounded by spacious bedrooms and airy balconies.
-                             Each villa offers a versatile front lobby for socializing, ensuring your comfort and discretion.</p>
+                            Immerse yourself in your secluded pool, surrounded by spacious bedrooms and airy balconies.
+                            Each villa offers a versatile front lobby for socializing, ensuring your comfort and
+                            discretion.</p>
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6">
@@ -137,14 +169,16 @@
                             <h3>Agarwod</h3>
                         </a>
                         <p>Enjoy this fully air-conditioned room with an attached<br>
-                         washroom and a king-sized bed.
-                             Located adjacent to <br>the
-                              reception and restaurant, Agarwood is an ideal sp<br>ace from where you can view the entire Ginberry prop<br>erty,
-                              top to bottom. Whether it’s morning, evening, or night, drink in the beautiful sights and enjoy the spe<br>cial vibes of Ginberry.</p>
+                            washroom and a king-sized bed.
+                            Located adjacent to <br>the
+                            reception and restaurant, Agarwood is an ideal sp<br>ace from where you can view the entire
+                            Ginberry prop<br>erty,
+                            top to bottom. Whether it’s morning, evening, or night, drink in the beautiful sights and
+                            enjoy the spe<br>cial vibes of Ginberry.</p>
                     </div>
                 </div>
 
-               <div class="col-lg-4 col-md-6">
+                <div class="col-lg-4 col-md-6">
                     <div class="service-item position-relative">
                         <div class="icon">
                             <i class="bi bi-easel"></i>
@@ -152,9 +186,11 @@
                         <a href="#" class="stretched-link">
                             <h3>Delight</h3>
                         </a>
-                        <p>The Delight Room offers a seamless fusion of luxury and heritage, providing a warm and elegant ambiance.
-                             Design<br>ed with interiors that reflect the rich traditions of Kerala, t<br>his room ensures a relaxing and memorable stay.
-                              Though<br>tfully crafted with modern amenities and tasteful decor, 
+                        <p>The Delight Room offers a seamless fusion of luxury and heritage, providing a warm and
+                            elegant ambiance.
+                            Design<br>ed with interiors that reflect the rich traditions of Kerala, t<br>his room
+                            ensures a relaxing and memorable stay.
+                            Though<br>tfully crafted with modern amenities and tasteful decor,
                             i<br>t’s the perfect retreat for those seeking comfort and tran<br>quility.</p>
                     </div>
                 </div>
@@ -166,10 +202,12 @@
                         <a href="#" class="stretched-link">
                             <h3>Luxury</h3>
                         </a>
-                        <p>Indulge in the ultimate comfort and sophistication with our Luxury Room. Designed for a lavish stay,
-                             this room features elegant interiors, modern amenities, and a se<br>rene ambiance that ensures relaxation.
-                              Experience a p<br>erfect blend of style and comfort,
-                             where every detail is crafted to offer you an unforgettable retreat.</p>
+                        <p>Indulge in the ultimate comfort and sophistication with our Luxury Room. Designed for a
+                            lavish stay,
+                            this room features elegant interiors, modern amenities, and a se<br>rene ambiance that
+                            ensures relaxation.
+                            Experience a p<br>erfect blend of style and comfort,
+                            where every detail is crafted to offer you an unforgettable retreat.</p>
                     </div>
                 </div>
             </div>
@@ -366,13 +404,13 @@
                 <div class="col-lg-5 col-md-5">
                     <h4>Welcome to Ginberry Resort</h4>
                     <h6>We offer you a warm and friendly stay –
-                         no matter where in the world you are from. 
-                         We’re committed to delivering a caring experience for you, 
-                         every time. Grab a bite, plan your itinerary, relax, and enjoy, set off on tourist visits, 
-                          we make it all happen for you.</h6>
-                    
+                        no matter where in the world you are from.
+                        We’re committed to delivering a caring experience for you,
+                        every time. Grab a bite, plan your itinerary, relax, and enjoy, set off on tourist visits,
+                        we make it all happen for you.</h6>
+
                 </div>
-             </div>
+            </div>
         </div>
     </div>
 

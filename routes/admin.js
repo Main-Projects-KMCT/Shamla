@@ -243,16 +243,50 @@ router.get("/edit-room/:id", verifySignedIn, async function (req, res) {
 
 router.post("/edit-room/:id", verifySignedIn, function (req, res) {
   let roomId = req.params.id;
+
+  // Update room details first
   adminHelper.updateroom(roomId, req.body).then(() => {
     if (req.files) {
-      let image = req.files.Image;
-      if (image) {
-        image.mv("./public/images/room-images/" + roomId + ".png");
-      }
+      const files = req.files; // Access all uploaded files
+      const fileKeys = Object.keys(files); // Get keys like 'Image1', 'Image2', etc.
+
+      // Loop through the files and save each one
+      let savePromises = fileKeys.map((key, index) => {
+        const image = files[key]; // Access the file
+        const uploadPath = path.join(
+          __dirname,
+          "../public/images/room-images/",
+          `${roomId}-${index + 1}.png` // Save as <roomId>-1.png, <roomId>-2.png, etc.
+        );
+
+        // Move the file to the destination folder
+        return new Promise((resolve, reject) => {
+          image.mv(uploadPath, (err) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve();
+            }
+          });
+        });
+      });
+
+      // Wait for all images to be saved before redirecting
+      Promise.all(savePromises)
+        .then(() => {
+          res.redirect("/admin/rooms/all-rooms");
+        })
+        .catch((err) => {
+          console.error("Error saving images:", err);
+          res.status(500).send("Failed to upload images.");
+        });
+    } else {
+      // If no new images were uploaded, just redirect
+      res.redirect("/admin/rooms/all-rooms");
     }
-    res.redirect("/admin/rooms/all-rooms");
   });
 });
+
 
 router.post("/delete-room/:id", verifySignedIn, async function (req, res) {
   await db.get().collection(collections.ROOM_COLLECTION).deleteOne({ _id: ObjectId(req.params.id) });

@@ -259,10 +259,16 @@ module.exports = {
           },
           {
             $set: {
-              Name: roomDetails.Name,
-              Category: roomDetails.Category,
+              roomname: roomDetails.roomname,
+              roomnumber: roomDetails.roomnumber,
               Price: roomDetails.Price,
-              Description: roomDetails.Description,
+              in: roomDetails.in,
+              out: roomDetails.out,
+              floor: roomDetails.floor,
+              ren: roomDetails.ren,
+              desc: roomDetails.desc,
+              fesilities: roomDetails.fesilities,
+
             },
           }
         )
