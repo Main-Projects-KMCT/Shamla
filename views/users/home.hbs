@@ -73,10 +73,44 @@
         </div>
 
     </section>
+ {{!-- <!-- About Section -->
+  <section id="about" class="about-section">
+    <div class="container section-title" "fade-up">
+        <h2>ABOUT</h2>
+    </div>
+<div class="container">
+    <div class="row gy-4">
+        <div class="col-lg-6 content" "fade-up" "100" >
+            <p>
+Ginberry Holidays is a newly launched premium resort nestled near the captivating Muthanga Wildlife Sanctuary.
+ Situated amidst the serene beauty of nature, Ginberry Holidays offers a haven of relaxation and adventure for guests of all ages.
+  Ginberry is a wheelchair-accessible family resort, which makes it suitable for guests of all abilities. 
+  Our dedicated staff ensure the highest standards of hospitality.
+Experience leisure at its finest with our array of facilities, including an infinity pool where you can unwind,
+ while soaking in the tranquil surroundings. Let your little ones frolic in our kids' park or challenge your friends and family
+  to a friendly game of badminton, volleyball, or carroms. And when hunger strikes, satisfy your cravings with a delightful 
+  BBQ feast under the stars. Ginberry is conveniently located just 250 meters away from Kalloor on Calicut-Mysore NH,
+   Ginberry Holidays provides easy accessibility for travelers seeking a perfect blend of nature and luxury.
 
+</p>
+<ul>
+    <li><i class="bi bi-check2-circle"></i><span>Website:www.ginberryholidays.com</span></li>
+     <li><i class="bi bi-check2-circle"></i><span>Phone:+91 7510731083</span></li>
+     <li><i class="bi bi-check2-circle"></i><span>Address:Ginberry Holidays, Kalloor, Near Muthanga, Sulthan Bathery, Wayanad District, Kerala Pin Code : 673592</span></li>
+</ul>
+        </div> --}}
 
+{{!-- <div class="col-lg-6" "fade-up" "200">
+Thrilling eye feast of thousands of acres of paddy field.
+Close to Muthanga, but away from wild animals.
+A running stream in the middle of the property.
+All villas are special theme - based.
+Unique art works & paintings in the premises.
+Completely fenced to protect from animal encroachment.
+Five water bodies to breeze the atmosphere : An infinity pool, 2 private pools, a lotus pond and a stream pond.
+Both floor and cieling of the Restaurant are made out of aromatic Red Akhil wood.
 
-
+</div> --}}
 
     <!-- Call To Action Section -->
     <section id="call-to-action" class="call-to-action section light-background">
@@ -106,9 +140,9 @@
 
     <!-- Services Section -->
     <section id="services" class="services section">
-
+     
         <div class="container">
-
+        <h2>SERVICES</h2>
             <div class="row gy-4">
 
                 <div class="col-lg-4 col-md-6">
@@ -117,6 +151,7 @@
                             <i class="bi bi-activity"></i>
                         </div>
                         <a href="#" class="stretched-link">
+                           
                             <h3>Boat House</h3>
                         </a>
                         <p>This full air conditioned stand alone villa is constructed completely modelled on Alappuzha
@@ -285,7 +320,7 @@
 
                             if (seatsAvailable === 0) {
                                 button.disabled = true; // Disable the button if sold out
-                                button.textContent = 'Sold Out'; // Change the button text
+                                button.textContent = 'Booked'; // Change the button text
                                 button.classList.add('disabled'); // Optionally add a disabled class for styling
                             } else {
                                 button.addEventListener('click', function () {

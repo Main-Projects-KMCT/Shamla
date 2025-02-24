@@ -20,7 +20,9 @@
 
         <div class="container position-relative d-flex align-items-center justify-content-between">
            <a href="/" class="logo d-flex align-items-center ms-5">
-        <img src="assets/img/ginberry-logo.png" alt="Ginberry Logo" style="width: 200px; height:300px">
+        <img src="assets/img/ginberry-logo.png" alt="Ginberry Logo" 
+     style="max-width: 200px; max-height: 500px;">
+
          </a>
         
     </div>
@@ -29,7 +31,7 @@
             <nav id="navmenu" class="navmenu">
                 <ul>
                     <li><a href="/" class="active" style="color: rgb(84, 157, 10); font-size: 20px; font-weight: bold;">Home<br></a></li>
-                    <li><a href="/" class="active" style="color: rgb(84, 157, 10); font-size: 20px; font-weight: bold;">About</a> </li>
+                    {{!-- <li><a href="/" class="active" style="color: rgb(84, 157, 10); font-size: 20px; font-weight: bold;">About</a> </li> --}}
                     <li><a href="/all-rooms" class="active" style="color: rgb(84, 157, 10); font-size: 20px; font-weight: bold;">Rooms</a></li>
                     <li><a href="/"class="active" style="color: rgb(84, 157, 10); font-size: 20px; font-weight: bold;">Contact</a></li>
                     {{#if user}}
