@@ -68,15 +68,15 @@
                             <div class="col-md-6">
                                 <label for="inputName5" class="form-label">Room Name <span
                                         class="text-danger">*</span></label>
-                                {{!-- <input type="text" class="form-control" name="roomname" id="inputName5"> --}}
-                                <select class="form-select" name="roomname" aria-label="Default select example"
+                                <input type="text" class="form-control" name="roomname" id="inputName5">
+                                {{!-- <select class="form-select" name="roomname" aria-label="Default select example"
                                     required>
                                     <option selected disabled>Select Room</option>
                                     <option value="Boat house">Boat house</option>
                                     <option value="igloo cave">Igloo Cave</option>
                                     <option value="pool villa">Pool Villa</option>
 
-                                </select>
+                                </select> --}}
                             </div>
                             <div class="col-md-6">
                                 <label for="inputName5" class="form-label">Room Number <span
@@ -84,6 +84,21 @@
                                 <input type="text" class="form-control" value="{{roomnumber}}" name="roomnumber"
                                     id="inputName5">
                                 {{#if errors.roomnumber}}<div class="text-danger">{{errors.roomnumber}}</div>{{/if}}
+                            </div>
+
+                            <div class="col-md-12">
+                                <label for="inputName5" class="form-label">Select Category <span
+                                        class="text-danger">*</span></label>
+                                {{!-- <input type="text" class="form-control" name="roomname" id="inputName5"> --}}
+                                <select class="form-select" name="category" aria-label="Default select example"
+                                    required>
+                                    <option selected disabled>Select Category</option>
+                                    {{#each categories}}
+                                    <option value="{{this._id}}">{{this.name}}</option>
+                                    {{/each}}
+
+
+                                </select>
                             </div>
                             <div class="col-md-6">
                                 <label for="inputName5" class="form-label">Est Cost <span
@@ -95,20 +110,7 @@
                                 <label for="inputName5" class="form-label">Advance Amount</label>
                                 <input type="text" class="form-control" name="AdvPrice" id="advcost" readonly>
                             </div>
-                            <div class="col-md-12">
-                                <label for="inputName5" class="form-label">Select Category <span
-                                        class="text-danger">*</span></label>
-                                {{!-- <input type="text" class="form-control" name="roomname" id="inputName5"> --}}
-                                <select class="form-select" name="category" aria-label="Default select example"
-                                    required>
-                                    <option selected disabled>Select Category</option>
-                                    <option value="Boat house">Boat house</option>
-                                    <option value="igloo Cave">Igloo Cave</option>
-                                    <option value="private pool villa">Private pool villa</option>
-                                    <option value="Agarwood(on work)">Agarwood (on work)</option>
 
-                                </select>
-                            </div>
 
                             <p><b>Est Time</b></p>
                             <hr class="mt-0 mb-0">

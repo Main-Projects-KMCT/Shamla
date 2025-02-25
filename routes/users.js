@@ -26,10 +26,45 @@ router.get("/", async function (req, res, next) {
 
 router.get("/all-rooms", async function (req, res, next) {
   let user = req.session.user;
+  let categories = await adminHelper.getAllCategories();
   adminHelper.getAllrooms().then((rooms) => {
-    res.render("users/all-rooms", { admin: false, rooms, user });
+    res.render("users/all-rooms", { admin: false, categories, rooms, user });
   });
 });
+
+// router.get("/rooms/:id", async function (req, res, next) {
+//   let user = req.session.user;
+//   let categories = await adminHelper.getAllCategories();
+//   adminHelper.getAllrooms().then((rooms) => {
+//     res.render("users/rooms", { admin: false, categories, rooms, user });
+//   });
+// });
+
+router.get("/rooms/:id", async (req, res) => {
+  let user = req.session.user;
+  try {
+    let categoryId = req.params.id; // Get category ID from URL
+    let rooms = await adminHelper.getRoomsByCategory(categoryId); // Fetch rooms
+
+    res.render("users/rooms", { admin: false, rooms, user }); // Render the rooms page
+  } catch (error) {
+    console.error("Error fetching rooms by category:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+
+// router.get("/rooms/:categoryId", async (req, res) => {
+//   try {
+//     let categoryId = req.params.categoryId; // Get category ID from URL
+//     let rooms = await roomHelpers.getRoomsByCategory(categoryId); // Fetch rooms
+
+//     res.render("rooms", { rooms }); // Render rooms page with filtered rooms
+//   } catch (error) {
+//     console.error("Error fetching rooms by category:", error);
+//     res.status(500).send("Internal Server Error");
+//   }
+// });
 
 
 

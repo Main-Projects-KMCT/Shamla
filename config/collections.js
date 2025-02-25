@@ -9,6 +9,6 @@ module.exports = {
     FEEDBACK_COLLECTION: "feedback",
     NOTIFICATIONS_COLLECTION: "notification",
     ROOM_COLLECTION: "rooms",
-
+    CATEGORY_COLLECTION: "category",
 
 }

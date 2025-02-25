@@ -6,6 +6,30 @@ const { ObjectId } = require('mongodb'); // Import ObjectId for MongoDB
 
 module.exports = {
 
+
+
+  addCategory: (category, callback) => {
+    console.log(category);
+    db.get()
+      .collection(collections.CATEGORY_COLLECTION)
+      .insertOne(category)
+      .then((data) => {
+        console.log(data);
+        callback(data.ops[0]._id);
+      });
+  },
+
+  getAllCategories: () => {
+    return new Promise(async (resolve, reject) => {
+      let categories = await db
+        .get()
+        .collection(collections.CATEGORY_COLLECTION)
+        .find()
+        .toArray();
+      resolve(categories);
+    });
+  },
+
   ///////ADD staff/////////////////////                                         
   addnotification: (notification, callback) => {
     console.log(notification);
@@ -188,34 +212,138 @@ module.exports = {
 
   ///////ADD ROOOOOMS/////////////////////                                         
   addroom: (room, callback) => {
-    // Add createdAt field with the current timestamp
-    room.createdAt = new Date();
-    room.Price = parseInt(room.Price);
-    room.seat = 1;
+    try {
+      // Convert category ID to ObjectId
+      if (room.category) {
+        room.category = new ObjectId(room.category);
+      }
 
-    console.log(room);
-    db.get()
-      .collection(collections.ROOM_COLLECTION)
-      .insertOne(room)
-      .then((data) => {
-        console.log(data);
-        callback(data.ops[0]._id); // For MongoDB driver < v4.0
-      })
-      .catch((err) => {
-        console.error('Error inserting room:', err);
-      });
+      // Ensure price is an integer
+      room.Price = parseInt(room.Price);
+
+      // Add createdAt field with the current timestamp
+      room.createdAt = new Date();
+
+      // Set default seat value
+      room.seat = 1;
+
+      console.log(room);
+
+      db.get()
+        .collection(collections.ROOM_COLLECTION)
+        .insertOne(room)
+        .then((data) => {
+          console.log(data);
+          callback(data.insertedId); // Correct for MongoDB v4+
+        })
+        .catch((err) => {
+          console.error("Error inserting room:", err);
+        });
+    } catch (error) {
+      console.error("Error processing room data:", error);
+    }
   },
 
 
   ///////GET ALL room/////////////////////                                            
   getAllrooms: () => {
     return new Promise(async (resolve, reject) => {
-      let rooms = await db
-        .get()
-        .collection(collections.ROOM_COLLECTION)
-        .find()
-        .toArray();
-      resolve(rooms);
+      try {
+        let rooms = await db.get().collection(collections.ROOM_COLLECTION)
+          .aggregate([
+            {
+              $lookup: {
+                from: collections.CATEGORY_COLLECTION, // Collection to join
+                localField: "category", // Field in ROOM_COLLECTION
+                foreignField: "_id", // Field in CATEGORY_COLLECTION
+                as: "categoryDetails" // Output array name
+              }
+            },
+            {
+              $unwind: {
+                path: "$categoryDetails",
+                preserveNullAndEmptyArrays: true // Keep rooms even if no matching category is found
+              }
+            },
+            {
+              $project: {
+                _id: 1, // Room ID
+                roomname: 1, // Room Name
+                roomnumber: 1, // Room Price
+                Price: 1, // Include description if exists
+                AdvPrice: 1,
+
+                in: 1,
+                out: 1,
+                ren: 1,
+                desc: 1,
+                fesilities: 1,
+                createdAt: 1,
+                seat: 1,
+
+                images: 1, // Include images if exists
+                categoryId: "$category", // Keep category ID
+                categoryName: { $ifNull: ["$categoryDetails.name", "Unknown"] } // If category not found, show "Unknown"
+              }
+            }
+          ])
+          .toArray();
+
+        resolve(rooms);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
+
+  getRoomsByCategory: (categoryId) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        let rooms = await db.get().collection(collections.ROOM_COLLECTION)
+          .aggregate([
+            {
+              $match: { category: new ObjectId(categoryId) } // Filter rooms by category ID
+            },
+            {
+              $lookup: {
+                from: collections.CATEGORY_COLLECTION,
+                localField: "category",
+                foreignField: "_id",
+                as: "categoryDetails"
+              }
+            },
+            {
+              $unwind: {
+                path: "$categoryDetails",
+                preserveNullAndEmptyArrays: true
+              }
+            },
+            {
+              $project: {
+                _id: 1,
+                roomname: 1,
+                Price: 1,
+                AdvPrice: 1,
+                in: 1,
+                out: 1,
+                ren: 1,
+                desc: 1,
+                fesilities: 1,
+                createdAt: 1,
+                seat: 1,
+                images: 1,
+                categoryId: "$category",
+                categoryName: { $ifNull: ["$categoryDetails.name", "Unknown"] }
+              }
+            }
+          ])
+          .toArray();
+
+        resolve(rooms);
+      } catch (error) {
+        reject(error);
+      }
     });
   },
 

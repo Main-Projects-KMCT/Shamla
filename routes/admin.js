@@ -184,9 +184,10 @@ router.get("/all-rooms", verifySignedIn, function (req, res) {
   });
 });
 
-router.get("/add-room", verifySignedIn, function (req, res) {
+router.get("/add-room", verifySignedIn, async function (req, res) {
   let administator = req.session.admin;
-  res.render("admin/rooms/add-room", { admin: true, layout: "admin-layout", administator });
+  let categories = await adminHelper.getAllCategories();
+  res.render("admin/rooms/add-room", { admin: true, layout: "admin-layout", categories, administator });
 });
 
 router.post("/add-room", async (req, res) => {
@@ -412,6 +413,60 @@ router.post("/search", verifySignedIn, function (req, res) {
   adminHelper.searchProduct(req.body).then((response) => {
     res.render("admin/search-result", { admin: true, layout: "admin-layout", administator, response });
   });
+});
+
+
+
+router.get("/all-categories", verifySignedIn, function (req, res) {
+  let administator = req.session.admin;
+  adminHelper.getAllCategories().then((categories) => {
+    res.render("admin/category/all-categories", { admin: true, categories, layout: "admin-layout", administator });
+  });
+});
+
+
+router.get("/add-category", verifySignedIn, function (req, res) {
+  let administator = req.session.admin;
+  res.render("admin/category/add-category", { admin: true, layout: "admin-layout", administator });
+});
+
+router.post("/add-category", function (req, res) {
+  adminHelper.addCategory(req.body, (id) => {
+    let image = req.files.Image;
+    image.mv("./public/images/category-images/" + id + ".png", (err, done) => {
+      if (!err) {
+        res.redirect("/admin/category/all-categories");
+      } else {
+        console.log(err);
+      }
+    });
+  });
+});
+
+router.get("/edit-category/:id", verifySignedIn, async function (req, res) {
+  let administator = req.session.admin;
+  let categoryId = req.params.id;
+  let category = await adminHelper.getCategoryDetails(categoryId);
+  console.log(category);
+  res.render("admin/category/edit-category", { admin: true, category, layout: "admin-layout", administator });
+});
+
+router.post("/edit-category/:id", verifySignedIn, function (req, res) {
+  let categoryId = req.params.id;
+  adminHelper.updateCategory(categoryId, req.body).then(() => {
+    if (req.files) {
+      let image = req.files.Image;
+      if (image) {
+        image.mv("./public/images/category-images/" + categoryId + ".png");
+      }
+    }
+    res.redirect("/admin/category/all-categories");
+  });
+});
+
+router.post("/delete-category/:id", verifySignedIn, async function (req, res) {
+  await db.get().collection(collections.CATEGORY_COLLECTION).deleteOne({ _id: ObjectId(req.params.id) });
+  res.redirect("/admin/category/all-categories");
 });
 
 
