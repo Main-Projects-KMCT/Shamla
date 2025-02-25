@@ -189,10 +189,30 @@ router.get("/add-room", verifySignedIn, function (req, res) {
   res.render("admin/rooms/add-room", { admin: true, layout: "admin-layout", administator });
 });
 
-router.post("/add-room", (req, res) => {
+router.post("/add-room", async (req, res) => {
+  const { roomnumber } = req.body;
+  let errors = {};
+
   // Check if files are uploaded
   if (!req.files) {
     return res.status(400).send("No files were uploaded.");
+  }
+
+  const existingNum = await db.get()
+    .collection(collections.ROOM_COLLECTION)
+    .findOne({ roomnumber });
+
+  if (existingNum) {
+    errors.roomnumber = "This room is already exist.";
+  }
+
+  if (Object.keys(errors).length > 0) {
+    return res.render("admin/rooms/add-room", {
+      admin: true,
+      layout: "admin-layout",
+      errors,
+      roomnumber
+    });
   }
 
   // Generate a unique ID for the room

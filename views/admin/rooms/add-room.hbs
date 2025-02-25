@@ -66,40 +66,80 @@
                         <form class="row g-3 mt-3" action="/admin/rooms/add-room" enctype="multipart/form-data"
                             method="POST">
                             <div class="col-md-6">
-                                <label for="inputName5" class="form-label">Room Name</label>
-                                <input type="text" class="form-control" name="roomname" id="inputName5">
+                                <label for="inputName5" class="form-label">Room Name <span
+                                        class="text-danger">*</span></label>
+                                {{!-- <input type="text" class="form-control" name="roomname" id="inputName5"> --}}
+                                <select class="form-select" name="roomname" aria-label="Default select example"
+                                    required>
+                                    <option selected disabled>Select Room</option>
+                                    <option value="Boat house">Boat house</option>
+                                    <option value="igloo cave">Igloo Cave</option>
+                                    <option value="pool villa">Pool Villa</option>
+
+                                </select>
                             </div>
                             <div class="col-md-6">
-                                <label for="inputName5" class="form-label">Room Number</label>
-                                <input type="text" class="form-control" name="roomnumber" id="inputName5">
+                                <label for="inputName5" class="form-label">Room Number <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" value="{{roomnumber}}" name="roomnumber"
+                                    id="inputName5">
+                                {{#if errors.roomnumber}}<div class="text-danger">{{errors.roomnumber}}</div>{{/if}}
                             </div>
-                            <div class="col-md-12">
-                                <label for="inputName5" class="form-label">Estimated Cost</label>
-                                <input type="text" class="form-control" name="Price" id="inputName5">
+                            <div class="col-md-6">
+                                <label for="inputName5" class="form-label">Est Cost <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="Price" id="estcost">
                             </div>
 
-                            <div class="col-md-12">
+                            <div class="col-md-6">
                                 <label for="inputName5" class="form-label">Advance Amount</label>
-                                <input type="text" class="form-control" name="AdvPrice" id="inputName5">
+                                <input type="text" class="form-control" name="AdvPrice" id="advcost" readonly>
+                            </div>
+                            <div class="col-md-12">
+                                <label for="inputName5" class="form-label">Select Category <span
+                                        class="text-danger">*</span></label>
+                                {{!-- <input type="text" class="form-control" name="roomname" id="inputName5"> --}}
+                                <select class="form-select" name="category" aria-label="Default select example"
+                                    required>
+                                    <option selected disabled>Select Category</option>
+                                    <option value="Boat house">Boat house</option>
+                                    <option value="igloo Cave">Igloo Cave</option>
+                                    <option value="private pool villa">Private pool villa</option>
+                                    <option value="Agarwood(on work)">Agarwood (on work)</option>
+
+                                </select>
                             </div>
 
                             <p><b>Est Time</b></p>
                             <hr class="mt-0 mb-0">
                             <div class="col-md-6">
-                                <label for="inputName5" class="form-label">From (Check in)</label>
-                                <input type="time" class="form-control" name="in" id="inputName5">
+                                <label for="inputName5" class="form-label">From (Check in) <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" value="5:00 PM" class="form-control" name="in" id="inputName5"
+                                    readonly>
                             </div>
                             <div class="col-md-6">
-                                <label for="inputName5" class="form-label">To (Check out)</label>
-                                <input type="time" class="form-control" name="out" id="inputName5">
+                                <label for="inputName5" class="form-label">To (Check out) <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" value="11:00 AM" class="form-control" name="out" id="inputName5"
+                                    readonly>
                             </div>
                             {{!-- <div class="col-md-6">
                                 <label for="inputEmail5" class="form-label">Floor</label>
                                 <input type="text" class="form-control" name="floor" id="inputEmail5">
                             </div> --}}
-                            <div class="col-md-6">
-                                <label for="inputPassword5" class="form-label">Room Emergency Number</label>
-                                <input type="number" name="ren" class="form-control" id="inputPassword5">
+                            <div class="col-md-12">
+                                <label for="inputPassword5" class="form-label">Room Emergency Number <span
+                                        class="text-danger">*</span></label>
+                                {{!-- <input type="number" name="ren" class="form-control" id="inputPassword5"> --}}
+
+                                <select class="form-select" name="ren" aria-label="Default select example" required>
+                                    <option selected>Select Number</option>
+                                    <option value="+91 9999 999 999">+91 9999 999 999</option>
+                                    <option value="+91 8888 999 111">+91 8888 999 111</option>
+                                    <option value="+91 3432 321 123">+91 3432 321 123</option>
+                                    <option value="+91 8987 444 222">+91 8987 444 222</option>
+                                </select>
                             </div>
 
                             <div class="col-md-12">
@@ -123,16 +163,17 @@
             <div class="col-lg-5">
                 <div class="card p-3">
                     <div class="card-body">
-                        <label class="mb-3">Upload Photos</label>
-                        <input type="file" name="Image1" class="form-control mb-3" id="inputPassword5">
+                        <label class="mb-3">Upload Room Photos <span class="text-danger">*</span></label>
+                        <input type="file" name="Image1" class="form-control mb-3" id="inputPassword5" accept="image/*"
+                            required>
 
-                        <input type="file" name="Image2" class="form-control mb-3" id="inputPassword5">
+                        <input type="file" name="Image2" class="form-control mb-3" id="inputPassword5" accept="image/*">
 
-                        <input type="file" name="Image3" class="form-control mb-3" id="inputPassword5">
+                        <input type="file" name="Image3" class="form-control mb-3" id="inputPassword5" accept="image/*">
 
-                        <input type="file" name="Image4" class="form-control mb-3" id="inputPassword5">
+                        <input type="file" name="Image4" class="form-control mb-3" id="inputPassword5" accept="image/*">
 
-                        <input type="file" name="Image5" class="form-control mb-3" id="inputPassword5">
+                        <input type="file" name="Image5" class="form-control mb-3" id="inputPassword5" accept="image/*">
 
                     </div>
                 </div>
@@ -145,9 +186,16 @@
     <div class="mb-4" style="float: inline-end;
 ">
         <button type="submit" class="btn btn-primary">Submit</button>
-        <button type="reset" class="btn btn-secondary">Reset</button>
+        <a href="/admin/rooms/all-rooms" class="btn btn-secondary">Cancel</a>
     </div>
     </form>
 
 
 </main><!-- End #main -->
+
+<script>
+    document.getElementById("estcost").addEventListener("input", function () {
+        let estCost = parseFloat(this.value) || 0; // Get the entered value and ensure it's a number
+        document.getElementById("advcost").value = Math.round(estCost * 0.5); // Set 50% of the value without decimals
+    });
+</script>
