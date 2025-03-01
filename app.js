@@ -38,6 +38,10 @@ app.engine(
       eq: function (a, b) {
         return a === b;
       },
+
+      toNumber: function (value) {
+        return Number(value);
+      },
       formatDate: function (dateString) {
         const date = new Date(dateString);
         const day = String(date.getDate()).padStart(2, '0');
@@ -73,12 +77,16 @@ db.connect((err) => {
 
 });
 app.use("/", usersRouter);
-app.use("/admin", adminRouter);
+
 app.use("/staff", staffRouter);
+app.use("/staff/rooms", staffRouter);
+
+app.use("/admin", adminRouter);
 app.use("/admin/users", adminRouter);
 app.use("/admin/staffs", adminRouter);
 app.use("/admin/rooms", adminRouter);
 app.use("/admin/category", adminRouter);
+app.use("/admin/payment", adminRouter);
 
 
 // catch 404 and forward to error handler

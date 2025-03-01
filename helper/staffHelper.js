@@ -2,6 +2,7 @@ var db = require("../config/connection");
 var collections = require("../config/collections");
 var bcrypt = require("bcrypt");
 const objectId = require("mongodb").ObjectID;
+const { ObjectId } = require("mongodb");
 
 module.exports = {
 
@@ -257,6 +258,48 @@ module.exports = {
   },
 
 
+  assignRoomToUser: (room, callback) => {
+    console.log(room);
+
+    // Convert roomId and assignTo to ObjectId
+    const roomId = ObjectId(room.roomId);
+    const assignTo = ObjectId(room.assignTo);
+    const assignDate = room.assignDate; // Ensure assignDate is included
+
+    db.get()
+      .collection(collections.ASSIGNED_ROOMS)
+      .insertOne({ roomId, assignTo, assignDate }) // Store assignDate in DB
+      .then((data) => {
+        console.log("Room assigned:", data.insertedId);
+
+        // Fetch the current seat value and ensure it's a number
+        return db.get()
+          .collection(collections.ROOM_COLLECTION)
+          .findOne({ _id: roomId });
+      })
+      .then((roomData) => {
+        if (!roomData || isNaN(roomData.seat)) {
+          throw new Error("Invalid seat value in database");
+        }
+
+        // Convert seat to a number and decrement it
+        return db.get()
+          .collection(collections.ROOM_COLLECTION)
+          .updateOne(
+            { _id: roomId },
+            { $set: { seat: Number(roomData.seat) - 1 } } // Convert & update
+          );
+      })
+      .then(() => {
+        console.log("Seat count updated successfully.");
+        callback(true);
+      })
+      .catch((err) => {
+        console.error("Error assigning room:", err);
+        callback(false);
+      });
+  },
+
   addProduct: (product, callback) => {
     console.log(product);
     product.Price = parseInt(product.Price);
@@ -436,6 +479,8 @@ module.exports = {
     });
   },
 
+
+
   changeStatus: (status, orderId) => {
     return new Promise((resolve, reject) => {
       db.get()
@@ -540,4 +585,49 @@ module.exports = {
 
     });
   },
+
+
+  cancelAssign: (assignId) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const dbInstance = db.get();
+
+        // 1️⃣ Find the assigned room to get roomId
+        const assignedRoom = await dbInstance
+          .collection(collections.ASSIGNED_ROOMS)
+          .findOne({ _id: ObjectId(assignId) });
+
+        if (!assignedRoom) {
+          return reject("Assigned room not found");
+        }
+
+        const roomId = assignedRoom.roomId; // Extract roomId
+
+        // 2️⃣ Remove the assigned room entry
+        const deleteResponse = await dbInstance
+          .collection(collections.ASSIGNED_ROOMS)
+          .deleteOne({ _id: ObjectId(assignId) });
+
+        if (deleteResponse.deletedCount === 0) {
+          return reject("Failed to cancel room assignment");
+        }
+
+        // 3️⃣ Increment the seat count in ROOM_COLLECTION
+        await dbInstance.collection(collections.ROOM_COLLECTION).updateOne(
+          { _id: roomId },
+          { $inc: { seat: 1 } } // Add +1 to seat count
+        );
+
+        console.log("Assignment canceled and seat count updated.");
+        resolve(true);
+      } catch (error) {
+        console.error("Error canceling assignment:", error);
+        reject(error);
+      }
+    });
+  },
+
+
 };
+
+

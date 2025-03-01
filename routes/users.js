@@ -32,6 +32,26 @@ router.get("/all-rooms", async function (req, res, next) {
   });
 });
 
+
+
+// // Render Update Order Page
+// router.get("/update-order", (req, res) => {
+//   res.render("users/updateorder");
+// });
+
+// // Update Order API
+// router.put("/update-order/:userId", async (req, res) => {
+//   const { userId } = req.params;
+//   const updatedData = req.body;
+
+//   try {
+//     const result = await orderHelper.updateOrder(userId, updatedData);
+//     res.json(result);
+//   } catch (error) {
+//     res.status(500).json({ success: false, message: "Internal Server Error", error });
+//   }
+// });
+
 // router.get("/rooms/:id", async function (req, res, next) {
 //   let user = req.session.user;
 //   let categories = await adminHelper.getAllCategories();
@@ -531,6 +551,29 @@ router.post("/search", verifySignedIn, async function (req, res) {
   // le = await userHelper.g(userId);
   userHelper.searchProduct(req.body).then((response) => {
     res.render("users/search-result", { admin: false, user, response });
+  });
+});
+
+
+
+
+
+router.get("/updateorder/:id", verifySignedIn, async function (req, res) {
+  let user = req.session.user;
+  let orderId = req.params.id;
+  let order = await userHelper.getorderDetails(orderId);
+  res.render("users/updateorder", { admin: false, order, user });
+});
+
+router.post("/updateorder/:id", verifySignedIn, function (req, res) {
+  let orderId = req.params.id;
+
+  // Update order details
+  userHelper.updateorder(orderId, req.body).then(() => {
+    res.redirect("/orders");
+  }).catch((err) => {
+    console.error("Error updating order:", err);
+    res.status(500).send("Failed to update order.");
   });
 });
 

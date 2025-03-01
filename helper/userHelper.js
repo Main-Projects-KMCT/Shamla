@@ -13,6 +13,78 @@ var instance = new Razorpay({
 
 module.exports = {
 
+
+
+  updateUserOrder: (userId, updatedData) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        let order = await db
+          .get()
+          .collection(collections.ORDER_COLLECTION)
+          .findOneAndUpdate(
+            { "user._id": objectId(userId) }, // Find order by userId
+            { $set: updatedData }, // Update fields with new data
+            { returnDocument: "after" } // Return the updated document
+          );
+
+        if (!order.value) {
+          resolve({ success: false, message: "Order not found for this user." });
+        } else {
+          resolve({ success: true, message: "Order updated successfully.", data: order.value });
+        }
+      } catch (error) {
+        reject({ success: false, message: "Failed to update order.", error: error.message });
+      }
+    });
+  },
+
+
+
+  ///////ADD order DETAILS/////////////////////                                            
+  getorderDetails: (orderId) => {
+    return new Promise((resolve, reject) => {
+      db.get()
+        .collection(collections.ORDER_COLLECTION)
+        .findOne({
+          _id: objectId(orderId)
+        })
+        .then((response) => {
+          resolve(response);
+        });
+    });
+  },
+
+
+  ///////UPDATE order/////////////////////                                            
+  updateorder: (orderId, orderDetails) => {
+    return new Promise((resolve, reject) => {
+      db.get()
+        .collection(collections.ORDER_COLLECTION)
+        .updateOne(
+          { _id: objectId(orderId) },
+          {
+            $set: {
+              "deliveryDetails.selecteddate": orderDetails.selecteddate,
+              "deliveryDetails.bedsheet": orderDetails.bedsheet,
+              "deliveryDetails.beds": orderDetails.beds,
+              "deliveryDetails.Note": orderDetails.Note,
+            },
+          }
+        )
+        .then((response) => {
+          resolve(response);
+        })
+        .catch((error) => {
+          reject(error);
+        });
+    });
+  },
+
+
+
+
+
+
   getnotificationById: (userId) => {
     return new Promise(async (resolve, reject) => {
       try {

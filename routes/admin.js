@@ -357,7 +357,7 @@ router.get("/all-orders", verifySignedIn, async function (req, res) {
   try {
     let orders = await adminHelper.getAllOrders(fromDate, toDate); // Pass the date range to the function
 
-    res.render("admin/finance", {
+    res.render("admin/all-orders", {
       admin: true,
       layout: "admin-layout",
       administator,
@@ -468,6 +468,15 @@ router.post("/delete-category/:id", verifySignedIn, async function (req, res) {
   await db.get().collection(collections.CATEGORY_COLLECTION).deleteOne({ _id: ObjectId(req.params.id) });
   res.redirect("/admin/category/all-categories");
 });
+
+
+router.get("/all-payments", verifySignedIn, async function (req, res) {
+  let administator = req.session.admin;
+  let { fromDate, toDate } = req.query;
+  let orders = await adminHelper.getAllOrders(fromDate, toDate);
+  res.render("admin/payment/all-payments", { admin: true, orders, layout: "admin-layout", administator });
+});
+
 
 
 module.exports = router;

@@ -1,0 +1,168 @@
+<main id="main" class="main">
+
+    <div class="pagetitle">
+        <h1>All Bookings</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/staff">Dashboard</a></li>
+                <li class="breadcrumb-item">Bookings</li>
+                <li class="breadcrumb-item active">All Bookings</li>
+            </ol>
+        </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+        <div class="row">
+            <div class="col-lg-12">
+
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="card-title">All Bookings</h5>
+                            {{!-- <a href="/admin/rooms/add-room" class="btn btn-dark">+ Add New Room</a> --}}
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table datatable border ">
+                                <thead>
+                                    <tr>
+                                        <th>No.</th>
+                                        <th>Room Details</th>
+                                        <th>User Details</th>
+                                        <th>Payment</th>
+                                        <th>Addons</th>
+                                        <th>Status</th>
+                                        <th>Selected Date</th>
+
+                                        <th>Manage</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{#each orders}}
+                                    <tr>
+                                        <td>{{incremented @index}}</td>
+
+                                        <!-- Room Details -->
+                                        <td>
+                                            <p class="mb-0"><b>Room Name: </b>{{room.roomname}}</p>
+                                            <p class="mb-0"><b>Room Number: </b>{{room.roomnumber}}</p>
+                                            <p class="mb-0"><b>Price: </b>{{room.Price}}/-</p>
+                                        </td>
+
+                                        <!-- Assigned To User -->
+                                        <td>
+                                            <p class="mb-0"><b>Name: </b>{{user.Fname}}
+                                                {{user.Lname}}</p>
+                                            <p class="mb-0"><b>Email: </b>{{user.Email}}</p>
+                                            <p class="mb-0"><b>Phone: </b>{{user.Phone}}</p>
+                                            <p class="mb-0"><b>Address: </b>{{user.Address}},
+                                                {{user.Pincode}}</p>
+                                        </td>
+
+                                        <!-- Assign Date -->
+                                        <td>{{this.fullAmount}}/- ({{this.paymentMethod}})</td>
+                                        <td>
+                                            <p class="mb-0"><b>Bed Sheet Type : </b>{{deliveryDetails.bedsheet}}</p>
+                                            <p class="mb-0"><b>Beds : </b>{{deliveryDetails.beds}}</p>
+                                            <p class="mb-0"><b>Note : </b>{{deliveryDetails.Note}}</p>
+
+                                        </td>
+                                        <td>{{deliveryDetails.selecteddate}}</td>
+
+                                        <td>{{this.status}}</td>
+
+
+                                        <td class="d-flex gap-2"><a href="/staff/cancel-booking/{{this._id}}"
+                                                onclick="return confirm('Are You Sure to Vacate This Booking ?')"
+                                                class="btn btn-danger">Vacate</a>
+
+                                            <a href="/staff/cancel-booking/{{this._id}}"
+                                                onclick="return confirm('Are You Sure to Cancel This Booking ?')"
+                                                class="btn btn-danger"><i class="bi bi-trash"></i></a>
+                                        </td>
+                                    </tr>
+                                    {{/each}}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </div>
+        </div>
+    </section>
+
+</main><!-- End #main -->
+
+
+
+<!-- Bootstrap Modal -->
+<div class="modal fade" id="assignRoomModal" tabindex="-1" aria-labelledby="assignRoomModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="assignRoomModalLabel">Assign Room</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="assignRoomForm" action="/staff/assign-room" method="POST">
+                    <input type="hidden" id="roomId" name="roomId">
+
+                    <p><b>Room Name:</b> <span id="modalRoomName"></span></p>
+                    <p><b>Room Number:</b> <span id="modalRoomNumber"></span></p>
+                    <p><b>Category:</b> <span id="modalCategory"></span></p>
+                    <p><b>Price:</b> ₹<span id="modalPrice"></span></p>
+
+                    <div class="mb-3">
+                        <label for="assignTo" class="form-label"><b>Assign To:</b></label>
+                        <select class="form-control" id="assignTo" name="assignTo" required>
+                            <option value="" disabled selected>Select User</option>
+                            {{#each users}}
+                            <option value="{{this._id}}">{{this.Fname}}</option>
+                            {{/each}}
+                            <!-- Add users dynamically from backend if needed -->
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="assignDate" class="form-label"><b>Select Date:</b></label>
+                        <input type="date" class="form-control" id="assignDate" name="assignDate" required>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Confirm Assignment</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const assignButtons = document.querySelectorAll(".assign-btn");
+
+        assignButtons.forEach(button => {
+            button.addEventListener("click", function () {
+                // Get room details from button attributes
+                const roomId = this.getAttribute("data-roomid");
+                const roomName = this.getAttribute("data-roomname");
+                const roomNumber = this.getAttribute("data-roomnumber");
+                const category = this.getAttribute("data-category");
+                const price = this.getAttribute("data-price");
+
+                // Set modal values
+                document.getElementById("roomId").value = roomId;
+                document.getElementById("modalRoomName").textContent = roomName;
+                document.getElementById("modalRoomNumber").textContent = roomNumber;
+                document.getElementById("modalCategory").textContent = category;
+                document.getElementById("modalPrice").textContent = price;
+            });
+        });
+    });
+
+</script>

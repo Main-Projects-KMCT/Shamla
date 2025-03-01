@@ -10,5 +10,6 @@ module.exports = {
     NOTIFICATIONS_COLLECTION: "notification",
     ROOM_COLLECTION: "rooms",
     CATEGORY_COLLECTION: "category",
+    ASSIGNED_ROOMS: "assigned-rooms",
 
 }

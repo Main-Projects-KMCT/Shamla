@@ -574,4 +574,53 @@ router.post("/search", verifySignedIn, function (req, res) {
 });
 
 
+router.get("/bookings", verifySignedIn, async function (req, res) {
+  let staff = req.session.staff;
+  let { fromDate, toDate } = req.query;
+  let users = await adminHelper.getAllUsers();
+  let orders = await adminHelper.getAllOrders(fromDate, toDate);
+  res.render("staff/rooms/bookings", { admin: false, layout: "admin-layout", orders, users, staff });
+});
+
+
+router.get("/assigned", verifySignedIn, async function (req, res) {
+  let staff = req.session.staff;
+  let users = await adminHelper.getAllUsers();
+  let assignedrooms = await adminHelper.getAllAssignedRooms();
+  res.render("staff/rooms/assigned", { admin: false, layout: "admin-layout", assignedrooms, users, staff });
+});
+
+router.get("/cancel-room/:id", verifySignedIn, function (req, res) {
+  let assignId = req.params.id;
+  staffHelper.cancelAssign(assignId).then(() => {
+    res.redirect("/staff/assigned");
+  });
+});
+
+router.get("/cancel-booking/:id", verifySignedIn, function (req, res) {
+  let orderId = req.params.id;
+  adminHelper.cancelOrder(orderId).then(() => {
+    res.redirect("/staff/bookings");
+  });
+});
+
+
+
+
+router.get("/all-rooms", verifySignedIn, async function (req, res) {
+  let staff = req.session.staff;
+  let users = await adminHelper.getAllUsers();
+  let rooms = await adminHelper.getAllrooms();
+  res.render("staff/rooms/all-rooms", { admin: false, layout: "admin-layout", rooms, users, staff });
+});
+
+
+///////ADD notification/////////////////////                                         
+router.post("/assign-room", function (req, res) {
+  staffHelper.assignRoomToUser(req.body, (id) => {
+    res.redirect("/staff/rooms/all-rooms");
+  });
+});
+
+
 module.exports = router;

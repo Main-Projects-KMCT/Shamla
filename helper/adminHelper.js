@@ -8,6 +8,72 @@ module.exports = {
 
 
 
+  getAllPayments: () => {
+    return new Promise(async (resolve, reject) => {
+      let payments = await db
+        .get()
+        .collection(collections.ORDER_COLLECTION)
+        .find()
+        .toArray();
+      resolve(payments);
+    });
+  },
+
+
+  getAllAssignedRooms: () => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        let assignedrooms = await db
+          .get()
+          .collection(collections.ASSIGNED_ROOMS)
+          .aggregate([
+            {
+              $lookup: {
+                from: collections.ROOM_COLLECTION, // Join with ROOM_COLLECTION
+                localField: "roomId",
+                foreignField: "_id",
+                as: "roomDetails"
+              }
+            },
+            {
+              $lookup: {
+                from: collections.USERS_COLLECTION, // Join with USER_COLLECTION
+                localField: "assignTo",
+                foreignField: "_id",
+                as: "userDetails"
+              }
+            },
+            {
+              $unwind: "$roomDetails" // Convert roomDetails array to object
+            },
+            {
+              $unwind: "$userDetails" // Convert userDetails array to object
+            },
+            {
+              $project: {
+                _id: 1,
+                assignDate: 1,
+                "roomDetails.roomname": 1,
+                "roomDetails.Price": 1,
+                "roomDetails.roomnumber": 1,
+                "userDetails.Fname": 1,
+                "userDetails.Lname": 1,
+                "userDetails.Email": 1,
+                "userDetails.Phone": 1,
+                "userDetails.Address": 1,
+                "userDetails.Pincode": 1
+              }
+            }
+          ])
+          .toArray();
+
+        resolve(assignedrooms);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
   addCategory: (category, callback) => {
     console.log(category);
     db.get()
@@ -677,15 +743,54 @@ module.exports = {
   },
 
   cancelOrder: (orderId) => {
-    return new Promise((resolve, reject) => {
-      db.get()
-        .collection(collections.ORDER_COLLECTION)
-        .removeOne({ _id: objectId(orderId) })
-        .then(() => {
-          resolve();
-        });
+    return new Promise(async (resolve, reject) => {
+      try {
+        const dbInstance = db.get();
+
+        // 1️⃣ Find the order to get roomId
+        const order = await dbInstance
+          .collection(collections.ORDER_COLLECTION)
+          .findOne({ _id: objectId(orderId) });
+
+        if (!order) {
+          return reject("Order not found");
+        }
+
+        const roomId = order.room._id; // Extract roomId
+
+        // 2️⃣ Remove the order entry
+        const deleteResponse = await dbInstance
+          .collection(collections.ORDER_COLLECTION)
+          .deleteOne({ _id: objectId(orderId) });
+
+        if (deleteResponse.deletedCount === 0) {
+          return reject("Failed to cancel order");
+        }
+
+        // 3️⃣ Fetch the current seat value and ensure it's a number
+        const roomData = await dbInstance
+          .collection(collections.ROOM_COLLECTION)
+          .findOne({ _id: objectId(roomId) });
+
+        if (!roomData || isNaN(Number(roomData.seat))) {
+          return reject("Invalid seat value in database");
+        }
+
+        // 4️⃣ Convert seat to a number and increment it
+        await dbInstance.collection(collections.ROOM_COLLECTION).updateOne(
+          { _id: objectId(roomId) },
+          { $set: { seat: Number(roomData.seat) + 1 } } // Convert & update
+        );
+
+        console.log("Order canceled and seat count updated.");
+        resolve(true);
+      } catch (error) {
+        console.error("Error canceling order:", error);
+        reject(error);
+      }
     });
   },
+
 
   cancelAllOrders: () => {
     return new Promise((resolve, reject) => {
