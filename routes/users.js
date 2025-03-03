@@ -18,8 +18,9 @@ const verifySignedIn = (req, res, next) => {
 /* GET home page. */
 router.get("/", async function (req, res, next) {
   let user = req.session.user;
+  let categories = await adminHelper.getAllCategories();
   adminHelper.getAllrooms().then((rooms) => {
-    res.render("users/home", { admin: false, rooms, user });
+    res.render("users/home", { admin: false, rooms, categories, user });
   });
 });
 
