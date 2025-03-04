@@ -144,12 +144,13 @@
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <script>
-$("#checkout-form").submit((e) => {
-    e.preventDefault();
+    $("#checkout-form").submit((e) => {
+        e.preventDefault();
 
-    let selectedPaymentMethod = $("input[name='payment-method']:checked").val();
-    let advanceAmount = {{room.AdvPrice}}; // Get advance amount from template
-    let totalAmount = {{room.Price}}; // Get total price from template
+        let selectedPaymentMethod = $("input[name='payment-method']:checked").val();
+        let advanceAmount = {{ room.AdvPrice }
+    }; // Get advance amount from template
+    let totalAmount = {{ room.Price }}; // Get total price from template
     let paymentAmount = selectedPaymentMethod === "ADVANCE" ? advanceAmount : totalAmount;
 
     $.ajax({
@@ -186,8 +187,8 @@ $("#checkout-form").submit((e) => {
                 verifyPayment(response, order)
             },
             "prefill": {
-                "name": "Shahala nushri",
-                "email": "shahalanushri9@gmail.com",
+                "name": "Shamla",
+                "email": "Shamla@gmail.com",
                 "contact": "8156867466"
             },
             "notes": {
@@ -202,24 +203,24 @@ $("#checkout-form").submit((e) => {
     }
 
 
-function verifyPayment(payment, order, amountPaid) {
-    $.ajax({
-        url: '/verify-payment',
-        data: {
-            payment,
-            order,
-            amountPaid // Send the correct paid amount to the backend
-        },
-        method: 'post',
-        success: (response) => {
-            if (response.status) {
-                location.href = '/order-placed';
-            } else {
-                alert("Payment verification failed.");
+    function verifyPayment(payment, order, amountPaid) {
+        $.ajax({
+            url: '/verify-payment',
+            data: {
+                payment,
+                order,
+                amountPaid // Send the correct paid amount to the backend
+            },
+            method: 'post',
+            success: (response) => {
+                if (response.status) {
+                    location.href = '/order-placed';
+                } else {
+                    alert("Payment verification failed.");
+                }
             }
-        }
-    });
-}
+        });
+    }
 
 
 </script>

@@ -75,7 +75,68 @@ router.get("/add-staff", verifySignedIn, function (req, res) {
 });
 
 ///////ADD staff/////////////////////                                         
-router.post("/add-staff", function (req, res) {
+router.post("/add-staff", async function (req, res) {
+  const { staffname, email, phone, username, password, address } = req.body;
+  let errors = {};
+
+
+  // Check if username already exists
+  const existingUsername = await db.get()
+    .collection(collections.STAFF_COLLECTION)
+    .findOne({ username });
+
+  if (existingUsername) {
+    errors.username = "This username is already registered.";
+  }
+
+  // Check if username already exists
+  const existingEmail = await db.get()
+    .collection(collections.STAFF_COLLECTION)
+    .findOne({ email });
+
+  if (existingEmail) {
+    errors.email = "This email is already registered.";
+  }
+
+
+  // Check if username already exists
+  if (!phone) {
+    errors.phone = "Please enter your phone number.";
+  } else if (!/^\d{10}$/.test(phone)) {
+    errors.phone = "Phone number must be exactly 10 digits.";
+  } else {
+    const existingPhone = await db.get()
+      .collection(collections.STAFF_COLLECTION)
+      .findOne({ phone });
+
+    if (existingPhone) {
+      errors.phone = "This phone number is already registered.";
+    }
+  }
+
+  if (!password) {
+    errors.password = "Please enter a password.";
+  } else {
+    const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])[A-Za-z\d\W_]{8,}$/;
+    if (!strongPasswordRegex.test(password)) {
+      errors.password = "Password must be at least 8 characters long and include an uppercase letter, a lowercase letter, a number, and a special character.";
+    }
+  }
+
+
+  if (Object.keys(errors).length > 0) {
+    return res.render("admin/staffs/add-staff", {
+      admin: true,
+      layout: 'admin-layout',
+      errors,
+      staffname,
+      username,
+      email,
+      phone,
+      password,
+      address
+    });
+  }
   adminHelper.addstaff(req.body, (id) => {
     res.redirect("/admin/staffs/all-staffs");
   });
@@ -87,11 +148,63 @@ router.get("/edit-staff/:id", verifySignedIn, async function (req, res) {
   let staffId = req.params.id;
   let staff = await adminHelper.getstaffDetails(staffId);
   console.log(staff);
-  res.render("admin/staff/edit-staff", { admin: true, layout: "admin-layout", staff, administator });
+  res.render("admin/staffs/edit-staff", { admin: true, layout: "admin-layout", staff, administator });
 });
 
 ///////EDIT staff/////////////////////                                         
-router.post("/edit-staff/:id", verifySignedIn, function (req, res) {
+router.post("/edit-staff/:id", verifySignedIn, async function (req, res) {
+  // const { staffname, email, phone, username } = req.body;
+  // let errors = {};
+
+
+  // // Check if username already exists
+  // const existingUsername = await db.get()
+  //   .collection(collections.STAFF_COLLECTION)
+  //   .findOne({ username });
+
+  // if (existingUsername) {
+  //   errors.username = "This username is already registered.";
+  // }
+
+  // // Check if username already exists
+  // const existingEmail = await db.get()
+  //   .collection(collections.STAFF_COLLECTION)
+  //   .findOne({ email });
+
+  // if (existingEmail) {
+  //   errors.email = "This email is already registered.";
+  // }
+
+
+  // // Check if username already exists
+  // if (!phone) {
+  //   errors.phone = "Please enter your phone number.";
+  // } else if (!/^\d{10}$/.test(phone)) {
+  //   errors.phone = "Phone number must be exactly 10 digits.";
+  // } else {
+  //   const existingPhone = await db.get()
+  //     .collection(collections.STAFF_COLLECTION)
+  //     .findOne({ phone });
+
+  //   if (existingPhone) {
+  //     errors.phone = "This phone number is already registered.";
+  //   }
+  // }
+
+
+  // if (Object.keys(errors).length > 0) {
+  //   return res.render("admin/edit-staff/:id", {
+  //     admin: true,
+  //     layout: 'admin-layout',
+  //     errors,
+  //     username,
+  //     email,
+  //     phone,
+  //   });
+  // }
+
+
+
   let staffId = req.params.id;
   adminHelper.updatestaff(staffId, req.body).then(() => {
     if (req.files) {
@@ -100,7 +213,7 @@ router.post("/edit-staff/:id", verifySignedIn, function (req, res) {
         image.mv("./public/images/staff-images/" + staffId + ".png");
       }
     }
-    res.redirect("/admin/staff/all-staffs");
+    res.redirect("/admin/staffs/all-staffs");
   });
 });
 
@@ -258,8 +371,10 @@ router.get("/edit-room/:id", verifySignedIn, async function (req, res) {
   let administator = req.session.admin;
   let roomId = req.params.id;
   let room = await adminHelper.getroomDetails(roomId);
+  let categories = await adminHelper.getAllCategories();
+
   console.log(room);
-  res.render("admin/rooms/edit-room", { admin: true, layout: "admin-layout", room, administator });
+  res.render("admin/rooms/edit-room", { admin: true, layout: "admin-layout", room, administator, categories });
 });
 
 router.post("/edit-room/:id", verifySignedIn, function (req, res) {

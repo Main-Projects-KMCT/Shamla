@@ -246,10 +246,13 @@ module.exports = {
           },
           {
             $set: {
-              Name: staffDetails.Name,
-              Category: staffDetails.Category,
-              Price: staffDetails.Price,
-              Description: staffDetails.Description,
+              staffname: staffDetails.staffname,
+              email: staffDetails.email,
+              phone: staffDetails.phone,
+              dept: staffDetails.dept,
+              address: staffDetails.address,
+              username: staffDetails.username,
+              password: staffDetails.password,
             },
           }
         )
@@ -463,6 +466,7 @@ module.exports = {
               desc: roomDetails.desc,
               fesilities: roomDetails.fesilities,
               AdvPrice: roomDetails.AdvPrice,
+              category: roomDetails.category,
 
 
             },

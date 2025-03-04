@@ -65,6 +65,21 @@
                         <!-- Multi Columns Form -->
                         <form class="row g-3 mt-3" action="/admin/edit-room/{{room._id}}" enctype="multipart/form-data"
                             method="POST">
+
+                            <div class="col-md-12">
+                                <label for="inputName5" class="form-label">Select Category <span
+                                        class="text-danger">*</span></label>
+                                {{!-- <input type="text" class="form-control" name="roomname" id="inputName5"> --}}
+                                <select class="form-select" name="category" aria-label="Default select example"
+                                    required>
+                                    <option selected disabled>Select Category</option>
+                                    {{#each categories}}
+                                    <option value="{{this._id}}">{{this.name}}</option>
+                                    {{/each}}
+
+
+                                </select>
+                            </div>
                             <div class="col-md-6">
                                 <label for="inputName5" class="form-label">Room Name</label>
                                 <input type="text" class="form-control" name="roomname" value="{{room.roomname}}"
@@ -75,39 +90,52 @@
                                 <input type="text" class="form-control" name="roomnumber" value="{{room.roomnumber}}"
                                     id="inputName5">
                             </div>
-                            <div class="col-md-12">
-                                <label for="inputName5" class="form-label">Estimate Cost</label>
-                                <input type="text" class="form-control" name="Price" value="{{room.Price}}"
-                                    id="inputName5">
+                            <div class="col-md-6">
+                                <label for="inputName5" class="form-label">Est Cost <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" value="{{room.Price}}" class="form-control" name="Price"
+                                    id="estcost">
                             </div>
 
-                            <div class="col-md-12">
+                            <div class="col-md-6">
                                 <label for="inputName5" class="form-label">Advance Amount</label>
-                                <input type="text" class="form-control" name="AdvPrice" value="{{room.AdvPrice}}"
-                                    id="inputName5">
+                                <input type="text" class="form-control" value="{{room.AdvPrice}}" name="AdvPrice"
+                                    id="advcost" readonly>
                             </div>
 
                             <p>Estimate Time</p>
                             <hr class="mt-0 mb-0">
                             <div class="col-md-6">
-                                <label for="inputName5" class="form-label">From (Check in)</label>
-                                <input type="time" class="form-control" name="in" value="{{room.in}}" id="inputName5">
+                                <label for="inputName5" class="form-label">From (Check in) <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" value="5:00 PM" class="form-control" name="in" id="inputName5"
+                                    readonly>
                             </div>
                             <div class="col-md-6">
-                                <label for="inputName5" class="form-label">To (Check out)</label>
-                                <input type="time" class="form-control" name="out" value="{{room.out}}" id="inputName5">
+                                <label for="inputName5" class="form-label">To (Check out) <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" value="11:00 AM" class="form-control" name="out" id="inputName5"
+                                    readonly>
                             </div>
-                        
-                            <div class="col-md-6">
-                                <label for="inputPassword5" class="form-label">Room Emergency Number</label>
-                                <input type="number" name="ren" class="form-control" value="{{room.ren}}"
-                                    id="inputPassword5">
+
+                            <div class="col-md-12">
+                                <label for="inputPassword5" class="form-label">Room Emergency Number <span
+                                        class="text-danger">*</span></label>
+                                {{!-- <input type="number" name="ren" class="form-control" id="inputPassword5"> --}}
+
+                                <select class="form-select" name="ren" aria-label="Default select example" required>
+                                    <option selected>Select Number</option>
+                                    <option value="+91 9999 999 999">+91 9999 999 999</option>
+                                    <option value="+91 8888 999 111">+91 8888 999 111</option>
+                                    <option value="+91 3432 321 123">+91 3432 321 123</option>
+                                    <option value="+91 8987 444 222">+91 8987 444 222</option>
+                                </select>
                             </div>
 
                             <div class="col-md-12">
                                 <label for="inputEmail5" class="form-label">Description</label>
-                                <textarea type="text" class="form-control" name="desc" value="{{room.desc}}"
-                                    id="inputEmail5"></textarea>
+                                <textarea type="text" class="form-control" name="desc"
+                                    id="inputEmail5">{{room.desc}}</textarea>
                             </div>
 
 
@@ -175,3 +203,10 @@
 
 
 </main><!-- End #main -->
+
+<script>
+    document.getElementById("estcost").addEventListener("input", function () {
+        let estCost = parseFloat(this.value) || 0; // Get the entered value and ensure it's a number
+        document.getElementById("advcost").value = Math.round(estCost * 0.5); // Set 50% of the value without decimals
+    });
+</script>
