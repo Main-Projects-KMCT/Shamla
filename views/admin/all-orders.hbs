@@ -31,8 +31,8 @@
                                         <th>User Details</th>
                                         <th>Payment</th>
                                         <th>Addons</th>
-                                        <th>Status</th>
                                         <th>Selected Date</th>
+                                        <th>Status</th>
 
                                         <th>Manage</th>
                                     </tr>
@@ -67,11 +67,44 @@
                                             <p class="mb-0"><b>Note : </b>{{deliveryDetails.Note}}</p>
 
                                         </td>
+
+
+
                                         <td>{{deliveryDetails.selecteddate}}</td>
 
-                                        <td>{{this.status}}</td>
 
 
+                                        <td>
+                                            <div class="dropdown">
+                                                <button class="btn 
+    {{#if (eq this.status 'Confirmed')}}btn-success
+    {{else if (eq this.status 'Declined')}}btn-danger
+    {{else}}btn-dark{{/if}} 
+    dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    {{this.status}}
+                                                </button>
+
+                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                                    <li><a class="dropdown-item"
+                                                            href="/admin/change-status/?status=placed&orderId={{this._id}}">placed</a>
+                                                    </li>
+                                                    <li>
+                                                        <a class="dropdown-item"
+                                                            href="/admin/change-status/?status=Confirmed&orderId={{this._id}}&phone={{user.Phone}}">Confirmed</a>
+                                                    </li>
+
+                                                    <li><a class="dropdown-item"
+                                                            href="/admin/change-status/?status=Declined&orderId={{this._id}}&phone={{user.Phone}}">Declined</a>
+                                                    </li>
+                                                    {{!-- <li><a class="dropdown-item"
+                                                            href="/admin/change-status/?status=delivering&orderId={{this._id}}">delivering</a>
+                                                    </li>
+                                                    <li><a class="dropdown-item"
+                                                            href="/admin/change-status/?status=delivered&orderId={{this._id}}">delivered</a>
+                                                    </li> --}}
+                                                </ul>
+                                            </div>
+                                        </td>
                                         <td class="d-flex gap-2"><a href="/staff/cancel-booking/{{this._id}}"
                                                 onclick="return confirm('Are You Sure to Vacate This Booking ?')"
                                                 class="btn btn-danger">Vacate</a>

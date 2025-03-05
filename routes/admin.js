@@ -533,12 +533,38 @@ router.get(
   }
 );
 
-router.get("/change-status/", verifySignedIn, function (req, res) {
-  let status = req.query.status;
-  let orderId = req.query.orderId;
-  adminHelper.changeStatus(status, orderId).then(() => {
+router.get("/change-status/", verifySignedIn, async function (req, res) {
+
+  try {
+
+    const { status, orderId, phone } = req.query;
+
+    // Update order status in the database
+    await db.get().collection(collections.ORDER_COLLECTION).updateOne(
+      { _id: new ObjectId(orderId) },
+      { $set: { status } }
+    );
+
+    // If the status is "Confirmed", redirect to WhatsApp
+    if (status === "Confirmed" && phone) {
+      const message = encodeURIComponent(
+        `✅ Your booking has been CONFIRMED!\n\nThank you for choosing us! 🏨`
+      );
+      return res.redirect(`https://wa.me/${phone}?text=${message}`);
+    }
+
+    if (status === "Declined" && phone) {
+      const message = encodeURIComponent(
+        `❌ Your booking has been Declined!\n\nSorry for your inconvenience`
+      );
+      return res.redirect(`https://wa.me/${phone}?text=${message}`);
+    }
+
     res.redirect("/admin/all-orders");
-  });
+  } catch (error) {
+    console.error("Error updating status:", error);
+    res.status(500).send("Internal Server Error");
+  }
 });
 
 router.get("/cancel-order/:id", verifySignedIn, function (req, res) {

@@ -761,7 +761,7 @@ module.exports = {
           { _id: objectId(orderId) },
           {
             $set: {
-              "orderObject.status": status,
+              "status": status,
             },
           }
         )
