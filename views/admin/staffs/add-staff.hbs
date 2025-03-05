@@ -76,11 +76,28 @@
                                 {{#if errors.email}}<div class="text-danger">{{errors.email}}</div>{{/if}}
                             </div>
                             <div class="col-md-6">
-                                <label for="inputPassword5" class="form-label">Phone Number</label>
-                                <input type="number" name="phone" class="form-control" id="inputPassword5"
-                                    value="{{phone}}" required>
-                                {{#if errors.phone}}<div class="text-danger">{{errors.phone}}</div>{{/if}}
-                            </div>
+                        <label for="inputPhone" class="form-label">Phone Number</label>
+                        <input type="text" name="phone" class="form-control" id="inputPhone"
+                            value="{{phone}}" required pattern="^\d{10}$" maxlength="10">
+                        <div class="text-danger" id="phoneError"></div>
+                    </div>
+
+                    <script>
+                        document.getElementById('inputPhone').addEventListener('input', function () {
+                            var phoneInput = this.value;
+                            var phoneError = document.getElementById('phoneError');
+
+                            // Basic check for exactly 10 digits
+                            var phoneRegex = /^\d{10}$/;
+
+                            if (!phoneRegex.test(phoneInput)) {
+                                phoneError.textContent = "Phone number must be 10 digits.";
+                            } else {
+                                phoneError.textContent = "";
+                            }
+    });
+</script>
+
                             <div class="col-md-12">
                                 <label for="inputState" class="form-label">Select Department</label>
                                 <select id="inputState" name="dept" class="form-select" required>
