@@ -142,6 +142,37 @@ router.post("/add-staff", async function (req, res) {
   });
 });
 
+// Check if email exists
+router.post("/check-email", async (req, res) => {
+  const { email } = req.body;
+  const existingEmail = await db.get()
+    .collection(collections.STAFF_COLLECTION)
+    .findOne({ email });
+
+  res.json({ exists: !!existingEmail }); // Returns true if exists, otherwise false
+});
+
+// Check if phone number exists
+router.post("/check-phone", async (req, res) => {
+  const { phone } = req.body;
+  const existingPhone = await db.get()
+    .collection(collections.STAFF_COLLECTION)
+    .findOne({ phone });
+
+  res.json({ exists: !!existingPhone }); // Returns true if exists, otherwise false
+});
+
+// Check if username exists
+router.post("/check-username", async (req, res) => {
+  const { username } = req.body;
+  const existingUsername = await db.get()
+    .collection(collections.STAFF_COLLECTION)
+    .findOne({ username });
+
+  res.json({ exists: !!existingUsername }); // Returns true if exists, otherwise false
+});
+
+
 ///////EDIT staff/////////////////////                                         
 router.get("/edit-staff/:id", verifySignedIn, async function (req, res) {
   let administator = req.session.admin;

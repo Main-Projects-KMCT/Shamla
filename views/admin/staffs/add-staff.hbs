@@ -73,14 +73,16 @@
                                 <label for="inputEmail5" class="form-label">Email</label>
                                 <input type="email" class="form-control" name="email" id="inputEmail5" value="{{email}}"
                                     required>
-                                {{#if errors.email}}<div class="text-danger">{{errors.email}}</div>{{/if}}
+                                <div id="emailError" class="text-danger"></div> <!-- Error will be shown here -->
                             </div>
+
                             <div class="col-md-6">
-                                <label for="inputPassword5" class="form-label">Phone Number</label>
-                                <input type="number" name="phone" class="form-control" id="inputPassword5"
-                                    value="{{phone}}" required>
-                                {{#if errors.phone}}<div class="text-danger">{{errors.phone}}</div>{{/if}}
+                                <label for="inputPhone" class="form-label">Phone Number</label>
+                                <input type="number" name="phone" class="form-control" id="inputPhone" value="{{phone}}"
+                                    required>
+                                <div id="phoneError" class="text-danger"></div> <!-- Error will be shown here -->
                             </div>
+
                             <div class="col-md-12">
                                 <label for="inputState" class="form-label">Select Department</label>
                                 <select id="inputState" name="dept" class="form-select" required>
@@ -111,11 +113,12 @@
 
                         <!-- Multi Columns Form -->
                         <div class="col-md-12 mt-4">
-                            <label for="inputName5" class="form-label">username</label>
-                            <input type="text" class="form-control" name="username" id="inputName5" value="{{username}}"
-                                required>
-                            {{#if errors.username}}<div class="text-danger">{{errors.username}}</div>{{/if}}
+                            <label for="inputUsername" class="form-label">Username</label>
+                            <input type="text" class="form-control" name="username" id="inputUsername"
+                                value="{{username}}" required>
+                            <div id="usernameError" class="text-danger"></div> <!-- Error will be shown here -->
                         </div>
+
                         <div class="col-md-12 mt-2">
                             <label for="inputPassword5" class="form-label">Password</label>
                             <input type="password" class="form-control" name="password" id="inputPassword5"
@@ -145,3 +148,73 @@
 
 
 </main><!-- End #main -->
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Include jQuery -->
+
+<script>
+    $(document).ready(function () {
+        // Check email availability
+        $("#inputEmail5").on("blur", function () {
+            let email = $(this).val();
+            if (email) {
+                $.ajax({
+                    url: "/admin/check-email",
+                    method: "POST",
+                    data: { email: email },
+                    success: function (response) {
+                        if (response.exists) {
+                            $("#emailError").text("This email is already registered.");
+                        } else {
+                            $("#emailError").text("");
+                        }
+                    }
+                });
+            } else {
+                $("#emailError").text("");
+            }
+        });
+
+        // Check phone number availability
+        $("#inputPhone").on("blur", function () {
+            let phone = $(this).val();
+            if (phone.length === 10) {
+                $.ajax({
+                    url: "/admin/check-phone",
+                    method: "POST",
+                    data: { phone: phone },
+                    success: function (response) {
+                        if (response.exists) {
+                            $("#phoneError").text("This phone number is already registered.");
+                        } else {
+                            $("#phoneError").text("");
+                        }
+                    }
+                });
+            } else {
+                $("#phoneError").text("Phone number must be exactly 10 digits.");
+            }
+        });
+
+        // Check username availability
+        $("#inputUsername").on("blur", function () {
+            let username = $(this).val();
+            if (username.length >= 3) {
+                $.ajax({
+                    url: "/admin/check-username",
+                    method: "POST",
+                    data: { username: username },
+                    success: function (response) {
+                        if (response.exists) {
+                            $("#usernameError").text("This username is already taken.");
+                        } else {
+                            $("#usernameError").text("");
+                        }
+                    }
+                });
+            } else {
+                $("#usernameError").text("Username must be at least 3 characters.");
+            }
+        });
+    });
+</script>

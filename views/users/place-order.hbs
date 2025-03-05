@@ -148,9 +148,9 @@
         e.preventDefault();
 
         let selectedPaymentMethod = $("input[name='payment-method']:checked").val();
-        let advanceAmount = {{ room.AdvPrice }
-    }; // Get advance amount from template
-    let totalAmount = {{ room.Price }}; // Get total price from template
+        let advanceAmount = {{ room.AdvPrice }}; // Ensure correct Handlebars syntax
+    let totalAmount = {{ room.Price }};
+
     let paymentAmount = selectedPaymentMethod === "ADVANCE" ? advanceAmount : totalAmount;
 
     $.ajax({
@@ -170,9 +170,9 @@
             alert("An error occurred while placing the order. Please try again.");
         }
     });
-});
-
+    });
 </script>
+
 <script>
     function razorpayPayment(order) {
         var options = {
