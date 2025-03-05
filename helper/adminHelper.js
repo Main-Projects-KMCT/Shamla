@@ -594,6 +594,18 @@ module.exports = {
     });
   },
 
+
+  getCategoryDetails: (categoryId) => {
+    return new Promise((resolve, reject) => {
+      db.get()
+        .collection(collections.CATEGORY_COLLECTION)
+        .findOne({ _id: objectId(categoryId) })
+        .then((response) => {
+          resolve(response);
+        });
+    });
+  },
+
   deleteProduct: (productId) => {
     return new Promise((resolve, reject) => {
       db.get()
@@ -688,6 +700,29 @@ module.exports = {
       } catch (err) {
         reject(err); // Catch any error in case of an invalid ObjectId format
       }
+    });
+  },
+
+
+
+  updateCategory: (categoryId, categoryDetails) => {
+    return new Promise((resolve, reject) => {
+      db.get()
+        .collection(collections.CATEGORY_COLLECTION)
+        .updateOne(
+          { _id: objectId(categoryId) },
+          {
+            $set: {
+              name: categoryDetails.name,
+              desc: categoryDetails.desc,
+              fesilities: categoryDetails.fesilities,
+              Description: categoryDetails.Description,
+            },
+          }
+        )
+        .then((response) => {
+          resolve();
+        });
     });
   },
 

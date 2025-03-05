@@ -14,10 +14,13 @@
 
             <div class="row gy-4">
                 {{#each categories}}
-                <div class="col-lg-6 order-1 order-lg-1 content">
-                    <br><br><br><br><br><br>
+                {{!-- <div class="col-lg-6 order-2 order-lg-2">
+                    <img src="/images/category-images/{{this._id}}.png" class="img-fluid about-img" alt="">
+                </div> --}}
+                <div class="col-lg-6 content mb-4">
+                    <img src="/images/category-images/{{this._id}}.png" class="img-fluid about-img" alt="">
+                    <br><br>
                     <h3>{{this.name}}</h3>
-
 
                     <p>
                         {{this.desc}}
@@ -28,9 +31,7 @@
 
                     <a href="/rooms/{{this._id}}" class="btn btn-dark btn-sm">Learn More + </a>
                 </div>
-                <div class="col-lg-6 order-2 order-lg-2">
-                    <img src="/images/category-images/{{this._id}}.png" class="img-fluid about-img" alt="">
-                </div>
+
                 {{/each}}
             </div>
 
