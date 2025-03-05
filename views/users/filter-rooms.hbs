@@ -1,0 +1,117 @@
+<main class="main">
+    <div class="container">
+
+        <form id="filterForm" action="/filter-rooms" method="GET">
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="roomname">Room Name</label>
+                    <input type="text" name="roomname" class="form-control" placeholder="Search Room Name">
+                </div>
+
+                <div class="col-md-4">
+                    <label for="category">Category</label>
+                    <select name="category" class="form-select">
+                        <option value="">Select Category</option>
+                        {{#each categories}}
+                        <option value="{{this._id}}">{{this.name}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="priceRange">Select Price Range:</label>
+                    <select name="priceRange" id="priceRange" class="form-select">
+                        <option value="">Select</option>
+                        <option value="1000-2000">1000 - 2000</option>
+                        <option value="2000-3000">2000 - 3000</option>
+                        <option value="3000-4000">3000 - 4000</option>
+                        <option value="5000-10000">5000 - 10000</option>
+                    </select>
+                </div>
+
+                <div class="col-md-12 mt-3">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Display Filtered Rooms -->
+
+
+        <div class="row gy-4 mt-4 mb-5">
+            {{#each rooms}}
+            <div class="col-lg-4 col-md-6">
+                <div class="service-item p-3  card shadow position-relative">
+                    <img src="/images/room-images/{{this._id}}-1.png" width="100%" height="300px"
+                        style="background-position: center; border-radius:10px;" alt="">
+                    <a href="/single-room/{{this._id}}" class="">
+
+                        <h3 class="mt-3">{{this.roomname}}</h3>
+                    </a>
+                    <p>{{this.desc}}</p>
+
+                    {{!-- <p>{{this.category}}</p> --}}
+                    <p>Price : ₹{{this.Price}}</p>
+                    <p>Advance Amount : ₹{{this.AdvPrice}}</p>
+                    <a href="/single-room/{{this._id}}" class="ct-btn btn btn2 btn-sm mb-3 btn-outline-dark ">View
+                        Details</a>
+
+                    <button class="btn btn-creative     btn-dark btn-sm ct-btn buy-now" data-id="{{this._id}}"
+                        data-seats="{{this.seat}}">Book Now</button>
+                </div>
+            </div>
+            {{/each}}
+
+        </div>
+
+        {{!-- <div class="row mt-4">
+            {{#each rooms}}
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{this.roomname}}</h5>
+                        <p><strong>Category:</strong> {{this.category}}</p>
+                        <p><strong>Price:</strong> ₹{{this.Price}}</p>
+                        <p><strong>Advance Price:</strong> ₹{{this.AdvPrice}}</p>
+                        <p>{{this.desc}}</p>
+                    </div>
+                </div>
+            </div>
+            {{/each}}
+        </div> --}}
+    </div>
+</main>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const buyNowButtons = document.querySelectorAll('.buy-now');
+
+        buyNowButtons.forEach(button => {
+            const seatsAvailable = parseInt(button.getAttribute('data-seats'), 10);
+
+            if (seatsAvailable === 0) {
+                button.disabled = true; // Disable the button if sold out
+                button.textContent = 'Sold Out'; // Change the button text
+                button.classList.add('disabled'); // Optionally add a disabled class for styling
+            } else {
+                button.addEventListener('click', function () {
+                    buyNow(button.getAttribute('data-id')); // Call the buyNow function
+                });
+            }
+        });
+    });
+
+    function buyNow(roomId) {
+        // Your buy now logic here, for example:
+        alert('Buying room with ID: ' + roomId);
+        // Implement your purchase logic (e.g., make an API call)
+    }
+</script>
+
+<script>
+    function buyNow(roomId) {
+        window.location.href = '/place-order/' + roomId;
+    }
+
+</script>

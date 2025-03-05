@@ -578,4 +578,42 @@ router.post("/updateorder/:id", verifySignedIn, function (req, res) {
   });
 });
 
+
+
+router.get("/filter-rooms", async (req, res) => {
+  try {
+    let { priceRange, category, roomname } = req.query;
+    let filters = {};
+
+    // ✅ Handle price range filter (convert Price to number)
+    if (priceRange) {
+      let [minPrice, maxPrice] = priceRange.split("-").map(Number);
+      filters.Price = { $gte: minPrice, $lte: maxPrice };
+    }
+
+    // ✅ Handle category filter
+    if (category) filters.category = new ObjectId(category);
+
+    // ✅ Handle room name search
+    if (roomname) filters.roomname = { $regex: new RegExp(roomname, "i") };
+
+    console.log("Filters applied:", filters); // Debugging
+
+    // Fetch rooms and categories
+    let categories = await adminHelper.getAllCategories();
+    let rooms = await adminHelper.getFilteredRooms(filters);
+
+    res.render("users/filter-rooms", {
+      admin: false,
+      layout: "layout",
+      rooms,
+      categories,
+    });
+  } catch (error) {
+    console.error("Error filtering rooms:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+
 module.exports = router;

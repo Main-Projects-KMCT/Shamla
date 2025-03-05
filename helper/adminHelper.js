@@ -8,6 +8,31 @@ module.exports = {
 
 
 
+  getFilteredRooms: async (filters) => {
+    try {
+      // ✅ Convert stored price values to numbers
+      return await db.get()
+        .collection(collections.ROOM_COLLECTION)
+        .aggregate([
+          {
+            $addFields: {
+              Price: { $toInt: "$Price" } // Convert string Price to integer
+            }
+          },
+          {
+            $match: filters
+          }
+        ])
+        .toArray();
+    } catch (error) {
+      console.error("Error fetching filtered rooms:", error);
+      return [];
+    }
+  },
+
+
+
+
   getAllPayments: () => {
     return new Promise(async (resolve, reject) => {
       let payments = await db
