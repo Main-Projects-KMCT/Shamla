@@ -23,13 +23,14 @@
                         </div>
 
                         <div class="table-responsive">
-                            <table class="table datatable border ">
+                            <table class="table datatable">
                                 <thead>
                                     <tr>
                                         <th>No.</th>
-                                        <th>Room Details</th>
-                                        <th>Assigned To</th>
-                                        <th>Assigned Date</th>
+                                        <th>Date</th>
+                                        <th>Staff Name</th>
+                                        <th>User Details</th>
+                                        <th>Room Number</th>
                                         <th>Manage</th>
                                     </tr>
                                 </thead>
@@ -37,30 +38,31 @@
                                     {{#each assignedrooms}}
                                     <tr>
                                         <td>{{incremented @index}}</td>
+                                        <td>{{formatDate this.createdAt}}</td>
+                                        <td>{{staffDetails.staffname}}</td>
+                                        <td>{{orderDetails.deliveryDetails.Fname}} <br>
+                                            {{orderDetails.deliveryDetails.Phone}} <br>
+                                            {{orderDetails.deliveryDetails.Email}} <br>
 
-                                        <!-- Room Details -->
+                                        </td>
+                                        <td>{{orderDetails.room.roomnumber}}</td>
+
                                         <td>
-                                            <p class="mb-0"><b>Room Name: </b>{{this.roomDetails.roomname}}</p>
-                                            <p class="mb-0"><b>Room Number: </b>{{this.roomDetails.roomnumber}}</p>
-                                            <p class="mb-0"><b>Price: </b>{{this.roomDetails.Price}}/-</p>
+                                            <div class="d-flex gap-2">
+                                                {{!-- <a href="/admin/staffs/edit-staff/{{this._id}}"
+                                                    class="btn btn-dark btn-sm">
+                                                    <i class="bi bi-pen"></i>
+                                                </a> --}}
+
+                                                <form action="/staff/delete-assign/{{this._id}}" method="POST">
+                                                    <button type="submit"
+                                                        onclick="return confirm('Are You Sure to Delete This Staff ?')"
+                                                        class="btn btn-danger btn-sm"><i
+                                                            class="bi bi-trash"></i></button>
+                                                </form>
+                                            </div>
                                         </td>
 
-                                        <!-- Assigned To User -->
-                                        <td>
-                                            <p class="mb-0"><b>Name: </b>{{this.userDetails.Fname}}
-                                                {{this.userDetails.Lname}}</p>
-                                            <p class="mb-0"><b>Email: </b>{{this.userDetails.Email}}</p>
-                                            <p class="mb-0"><b>Phone: </b>{{this.userDetails.Phone}}</p>
-                                            <p class="mb-0"><b>Address: </b>{{this.userDetails.Address}},
-                                                {{this.userDetails.Pincode}}</p>
-                                        </td>
-
-                                        <!-- Assign Date -->
-                                        <td>{{this.assignDate}}</td>
-
-                                        <td><a href="/staff/cancel-room/{{this._id}}"
-                                                onclick="return confirm('Are You Sure to Cancel This Booking ?')"
-                                                class="btn btn-danger">Cancel</a></td>
                                     </tr>
                                     {{/each}}
                                 </tbody>

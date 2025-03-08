@@ -460,15 +460,20 @@ module.exports = {
         // Decrement the seat count
         seatCount -= 1; // Decrement the seat count
 
-        // Convert back to string and update the room seat count
+        // Update the room collection with selecteddate (not as an array)
         await db.get()
           .collection(collections.ROOM_COLLECTION)
           .updateOne(
             { _id: objectId(room._id) },
-            { $set: { seat: seatCount.toString() } } // Convert number back to string
+            {
+              $set: {
+                seat: seatCount.toString(),  // Convert number back to string
+                bookedDate: order.selecteddate // Store the selected date as a single value
+              }
+            }
           );
 
-        resolve(response.insertedId); // Fixed: Return order ID properly
+        resolve(response.insertedId); // Return order ID properly
       } catch (error) {
         console.error("Error placing order:", error);
         reject(error);
@@ -477,13 +482,42 @@ module.exports = {
   },
 
 
+
   getUserOrder: (userId) => {
     return new Promise(async (resolve, reject) => {
       try {
         let orders = await db
           .get()
           .collection(collections.ORDER_COLLECTION)
-          .find({ userId: ObjectId(userId) }) // Use 'userId' directly, not inside 'orderObject'
+          .aggregate([
+            {
+              $match: { userId: ObjectId(userId) }
+            },
+            {
+              $lookup: {
+                from: collections.CATEGORY_COLLECTION, // Replace with actual category collection name
+                localField: "room.category",
+                foreignField: "_id",
+                as: "categoryDetails"
+              }
+            },
+            {
+              $unwind: {
+                path: "$categoryDetails",
+                preserveNullAndEmptyArrays: true
+              }
+            },
+            {
+              $addFields: {
+                "room.categoryName": "$categoryDetails.name"
+              }
+            },
+            {
+              $project: {
+                categoryDetails: 0
+              }
+            }
+          ])
           .toArray();
 
         resolve(orders);
@@ -492,7 +526,6 @@ module.exports = {
       }
     });
   },
-
   getOrderRooms: (orderId) => {
     return new Promise(async (resolve, reject) => {
       try {

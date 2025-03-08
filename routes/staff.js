@@ -583,11 +583,17 @@ router.get("/bookings", verifySignedIn, async function (req, res) {
 });
 
 
-router.get("/assigned", verifySignedIn, async function (req, res) {
+router.get("/assigned/:staffId", verifySignedIn, async function (req, res) {
   let staff = req.session.staff;
   let users = await adminHelper.getAllUsers();
-  let assignedrooms = await adminHelper.getAllAssignedRooms();
+  const staffId = req.params.staffId;
+  let assignedrooms = await staffHelper.getAllassignsById(staffId);
   res.render("staff/rooms/assigned", { admin: false, layout: "admin-layout", assignedrooms, users, staff });
+});
+
+router.post("/delete-assign/:id", verifySignedIn, async function (req, res) {
+  await db.get().collection(collections.ASSIGN_STAFF).deleteOne({ _id: ObjectId(req.params.id) });
+  res.redirect("/staff");
 });
 
 router.get("/cancel-room/:id", verifySignedIn, function (req, res) {

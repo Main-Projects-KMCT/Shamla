@@ -25,8 +25,13 @@
                         <div class="card-content px-4 py-2">
                             Booking Status : <span class="badge bg-primary p-2 mb-3"> {{this.status}}</span> <br>
                             <a class="text-dark" href="#!">
-                                <h3>{{this.room.roomname}}</h3>
+                                <h3>{{room.categoryName}}</h3>
+                                <p class="mt-3 mb-0">Room Number : {{room.roomnumber}}</p>
+                                <p class="mt-0 mb-0">Booked Date : {{deliveryDetails.selecteddate}}</p>
+                                <p class="mt-0 mb-3">Amount you paid : {{this.totalAmount}}/-</p>
+
                             </a>
+
                             {{!-- <a class="btn btn-dark btn-sm" href="/view-ordered-rooms/{{this._id}}">
                                 View Details</a> --}}
                             <a href="/cancel-order/{{this._id}}"

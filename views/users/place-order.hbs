@@ -243,24 +243,21 @@
         const day = selectedDate.getUTCDay();
 
         // Check if the selected date is Saturday (6) or Sunday (0)
-        if (day === 6 || day === 0) {
-            alert("Please select a weekday (Monday to Friday).");
-            this.value = ""; // Clear the input
-        } else {
-            // Check if the date is already booked
-            const response = await fetch(`/check-date-booking`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ selecteddate: this.value }) // Send the selected date
-            });
 
-            const data = await response.json();
-            if (data.booked) {
-                alert("This date is already booked.");
-                this.value = ""; // Clear the input
-            }
+        // Check if the date is already booked
+        const response = await fetch(`/check-date-booking`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ selecteddate: this.value }) // Send the selected date
+        });
+
+        const data = await response.json();
+        if (data.booked) {
+            alert("This date is already booked.");
+            this.value = ""; // Clear the input
         }
+
     });
 </script>

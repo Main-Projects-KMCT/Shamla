@@ -651,4 +651,39 @@ router.get("/all-payments", verifySignedIn, async function (req, res) {
 
 
 
+
+
+//////ALL staff/////////////////////                                         
+router.get("/assigned-staffs", verifySignedIn, async function (req, res) {
+  let administator = req.session.admin;
+  let users = await adminHelper.getAllUsers()
+  let orders = await adminHelper.getAllOrders()
+  let assignstaffs = await adminHelper.getAllassigns()
+  console.log("-------", assignstaffs);
+
+  res.render("admin/staffs/assigned-staffs", { admin: true, layout: "admin-layout", assignstaffs, users, orders, administator });
+});
+
+
+router.post("/delete-assign/:id", verifySignedIn, async function (req, res) {
+  await db.get().collection(collections.ASSIGN_STAFF).deleteOne({ _id: ObjectId(req.params.id) });
+  res.redirect("/admin/staffs/assigned-staffs");
+});
+
+///////ADD staff/////////////////////                                         
+router.get("/assign-staff", verifySignedIn, async function (req, res) {
+  let administator = req.session.admin;
+  let staffs = await adminHelper.getAllstaffs()
+  let orders = await adminHelper.getAllOrders()
+  res.render("admin/staffs/assign-staff", { admin: true, staffs, orders, layout: "admin-layout", administator });
+});
+
+///////ADD staff/////////////////////                                         
+router.post("/assign-staff", async function (req, res) {
+  adminHelper.assignstaff(req.body, (id) => {
+    res.redirect("/admin/staffs/assigned-staffs");
+  });
+});
+
+
 module.exports = router;

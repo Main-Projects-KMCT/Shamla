@@ -887,4 +887,115 @@ module.exports = {
 
     });
   },
-};
+
+
+
+
+
+  getAllassigns: () => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        let assignstaffs = await db
+          .get()
+          .collection(collections.ASSIGN_STAFF)
+          .aggregate([
+            {
+              $lookup: {
+                from: collections.ORDER_COLLECTION, // Join with Orders collection
+                localField: 'order',
+                foreignField: '_id',
+                as: 'orderDetails',
+              },
+            },
+            { $unwind: { path: '$orderDetails', preserveNullAndEmptyArrays: true } },
+            {
+              $lookup: {
+                from: collections.ROOM_COLLECTION, // Join with Orders collection
+                localField: 'room',
+                foreignField: '_id',
+                as: 'roomDetails',
+              },
+            },
+            { $unwind: { path: '$roomDetails', preserveNullAndEmptyArrays: true } },
+
+            {
+              $lookup: {
+                from: collections.STAFF_COLLECTION, // Join with Staff collection
+                localField: 'staff',
+                foreignField: '_id',
+                as: 'staffDetails',
+              },
+            },
+            { $unwind: { path: '$staffDetails', preserveNullAndEmptyArrays: true } },
+
+            {
+              $project: {
+                _id: 1,
+                order: 1,
+                staff: 1,
+                "orderDetails._id": 1,
+                "orderDetails.paymentMethod": 1,
+                "orderDetails.totalAmount": 1,
+                "orderDetails.fullAmount": 1,
+                "orderDetails.status": 1,
+                "orderDetails.deliveryDetails.Fname": 1, // Get user's first name
+                "orderDetails.deliveryDetails.Email": 1,
+                "orderDetails.deliveryDetails.Phone": 1,
+                "orderDetails.deliveryDetails.selecteddate": 1,
+                "orderDetails.room.selecteddate": 1,
+                "orderDetails.room.roomnumber": 1,
+                "orderDetails.room.Price": 1,
+                "orderDetails.room.AdvPrice": 1,
+                "orderDetails.room.desc": 1,
+                "staffDetails._id": 1,
+                "staffDetails.staffname": 1,
+                "staffDetails.role": 1,
+                "roomDetails.roomnumber": 1,
+                // "roomDetails._id": 1,
+                // "roomDetails._id": 1,
+                createdAt: {
+                  $dateToString: {
+                    format: "%Y-%m-%d %H:%M:%S",
+                    date: "$createdAt",
+                    timezone: "Asia/Kolkata",
+                  },
+                },
+              },
+            },
+          ])
+          .toArray();
+
+        resolve(assignstaffs);
+      } catch (error) {
+        console.error('Error fetching assigned staff:', error);
+        reject(error);
+      }
+    });
+  },
+
+
+
+  assignstaff: (assignstaff, callback) => {
+    try {
+      assignstaff.order = new ObjectId(assignstaff.order);
+      assignstaff.staff = new ObjectId(assignstaff.staff);
+
+      assignstaff.createdAt = new Date();
+
+      console.log(assignstaff);
+
+      db.get()
+        .collection(collections.ASSIGN_STAFF)
+        .insertOne(assignstaff)
+        .then((data) => {
+          console.log(data);
+          callback(data.insertedId);
+        })
+        .catch((err) => {
+          console.error('Error inserting staff:', err);
+        });
+    } catch (error) {
+      console.error('Invalid ObjectId:', error);
+    }
+  },
+}

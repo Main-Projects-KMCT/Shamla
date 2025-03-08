@@ -113,8 +113,10 @@
                                 class="ct-btn btn btn2 btn-sm w-25 btn-outline-dark d-none d-md-inline-block">View
                                 Details</a>
 
-                            <button class="btn btn-creative w-25     btn-dark btn-sm ct-btn buy-now"
-                                data-id="{{this._id}}" data-seats="{{this.seat}}">Book Now</button>
+                            <button class="btn btn-creative w-25 btn-dark btn-sm ct-btn buy-now" data-id="{{this._id}}"
+                                data-seats="{{this.seat}}" data-booked-date="{{this.bookedDate}}">
+                                Book Now
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -129,28 +131,35 @@
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 const buyNowButtons = document.querySelectorAll('.buy-now');
+                const currentDate = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
 
                 buyNowButtons.forEach(button => {
                     const seatsAvailable = parseInt(button.getAttribute('data-seats'), 10);
+                    const bookedDate = button.getAttribute('data-booked-date'); // Get booked date from DB
 
                     if (seatsAvailable === 0) {
-                        button.disabled = true; // Disable the button if sold out
-                        button.textContent = 'Sold Out'; // Change the button text
-                        button.classList.add('disabled'); // Optionally add a disabled class for styling
+                        button.disabled = true;
+                        button.textContent = 'Sold Out';
+                        button.classList.add('disabled');
+                    } else if (bookedDate === currentDate) {
+                        // If today's date matches the booked date, disable the button
+                        button.disabled = true;
+                        button.textContent = 'Not Available';
+                        button.classList.add('disabled');
                     } else {
                         button.addEventListener('click', function () {
-                            buyNow(button.getAttribute('data-id')); // Call the buyNow function
+                            buyNow(button.getAttribute('data-id'));
                         });
                     }
                 });
             });
 
             function buyNow(roomId) {
-                // Your buy now logic here, for example:
                 alert('Buying room with ID: ' + roomId);
                 // Implement your purchase logic (e.g., make an API call)
             }
         </script>
+
 
         <script>
             function elementsSearch() {

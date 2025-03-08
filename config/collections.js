@@ -11,5 +11,6 @@ module.exports = {
     ROOM_COLLECTION: "rooms",
     CATEGORY_COLLECTION: "category",
     ASSIGNED_ROOMS: "assigned-rooms",
+    ASSIGN_STAFF: "assigned-staffs",
 
 }
