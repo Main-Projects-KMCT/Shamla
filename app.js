@@ -87,6 +87,7 @@ app.use("/admin/staffs", adminRouter);
 app.use("/admin/rooms", adminRouter);
 app.use("/admin/category", adminRouter);
 app.use("/admin/payment", adminRouter);
+app.use("/admin/discount", adminRouter);
 
 
 // catch 404 and forward to error handler

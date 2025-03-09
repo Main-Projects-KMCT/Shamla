@@ -737,23 +737,40 @@ module.exports = {
     });
   },
 
-  getAllOrders: (fromDate, toDate) => {
+  getAllOrders: (filters) => {
     return new Promise(async (resolve, reject) => {
       try {
         let query = {};
 
-        // If fromDate and toDate are provided, filter orders by the date range
-        if (fromDate && toDate) {
-          // Add one day to toDate and set it to midnight
-          const adjustedToDate = new Date(toDate);
+        // Date Range Filtering (fromDate and toDate)
+        if (filters.fromDate && filters.toDate) {
+          const adjustedToDate = new Date(filters.toDate);
           adjustedToDate.setDate(adjustedToDate.getDate() + 1);
 
-          query = {
-            date: {
-              $gte: new Date(fromDate), // Orders from the start date
-              $lt: adjustedToDate       // Orders up to the end of the toDate
-            }
+          query.date = {
+            $gte: new Date(filters.fromDate),
+            $lt: adjustedToDate
           };
+        }
+
+        // Selected Date Filtering
+        if (filters.selecteddate) {
+          query["deliveryDetails.selecteddate"] = filters.selecteddate;
+        }
+
+        // Total Amount Filtering
+        if (filters.totalAmount) {
+          query.totalAmount = parseFloat(filters.totalAmount); // Ensure it's a number
+        }
+
+        // Placed By (User ID) Filtering
+        if (filters.userId) {
+          query["user._id"] = filters.userId;
+        }
+
+        // Room Number Filtering
+        if (filters.roomNumber) {
+          query["room.roomnumber"] = filters.roomNumber;
         }
 
         let orders = await db.get()
@@ -767,6 +784,7 @@ module.exports = {
       }
     });
   },
+
 
 
   getOrdersByDateRange: (fromDate, toDate) => {
@@ -997,5 +1015,31 @@ module.exports = {
     } catch (error) {
       console.error('Invalid ObjectId:', error);
     }
+  },
+
+
+
+  addDiscount: (discount, callback) => {
+    console.log(discount);
+    discount.createdAt = new Date();
+
+    db.get()
+      .collection(collections.DISCOUNTS_COLLECTION)
+      .insertOne(discount)
+      .then((data) => {
+        console.log(data);
+        callback(data.ops[0]._id);
+      });
+  },
+
+  getAllDiscounts: () => {
+    return new Promise(async (resolve, reject) => {
+      let discounts = await db
+        .get()
+        .collection(collections.DISCOUNTS_COLLECTION)
+        .find()
+        .toArray();
+      resolve(discounts);
+    });
   },
 }

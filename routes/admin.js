@@ -498,24 +498,28 @@ router.get("/remove-all-users", verifySignedIn, function (req, res) {
 
 router.get("/all-orders", verifySignedIn, async function (req, res) {
   let administator = req.session.admin;
-  let { fromDate, toDate } = req.query; // Get fromDate and toDate from the query parameters
+
+  // Extract filters from query params
+  let { fromDate, toDate, selecteddate, totalAmount, userId, roomNumber } = req.query;
+
+  let filters = { fromDate, toDate, selecteddate, totalAmount, userId, roomNumber };
 
   try {
-    let orders = await adminHelper.getAllOrders(fromDate, toDate); // Pass the date range to the function
+    let orders = await adminHelper.getAllOrders(filters);
 
     res.render("admin/all-orders", {
       admin: true,
       layout: "admin-layout",
       administator,
-      orders,     // Render the filtered orders
-      fromDate,   // Pass back toDate and fromDate to display on the form
-      toDate
+      orders,
+      filters  // Send filters to retain values in the form
     });
   } catch (error) {
     console.error("Error fetching orders:", error);
     res.status(500).send("Server Error");
   }
 });
+
 
 
 router.get(
@@ -649,6 +653,64 @@ router.get("/all-payments", verifySignedIn, async function (req, res) {
   res.render("admin/payment/all-payments", { admin: true, orders, layout: "admin-layout", administator });
 });
 
+
+
+
+
+
+
+router.get("/all-discounts", verifySignedIn, function (req, res) {
+  let administator = req.session.admin;
+  adminHelper.getAllDiscounts().then((discounts) => {
+    res.render("admin/discount/all-discounts", { admin: true, discounts, layout: "admin-layout", administator });
+  });
+});
+
+
+router.get("/add-discount", verifySignedIn, async function (req, res) {
+  let administator = req.session.admin;
+  let rooms = await adminHelper.getAllrooms()
+  res.render("admin/discount/add-discount", { admin: true, layout: "admin-layout", administator, rooms });
+});
+
+router.post("/add-discount", function (req, res) {
+  adminHelper.addDiscount(req.body, (id) => {
+    let image = req.files.Image;
+    image.mv("./public/images/discounts-images/" + id + ".png", (err, done) => {
+      if (!err) {
+        res.redirect("/admin/discount/all-discounts");
+      } else {
+        console.log(err);
+      }
+    });
+  });
+});
+
+router.get("/edit-discounts/:id", verifySignedIn, async function (req, res) {
+  let administator = req.session.admin;
+  let discountsId = req.params.id;
+  let discounts = await adminHelper.getDiscountDetails(discountsId);
+  console.log(discounts);
+  res.render("admin/discount/edit-discount", { admin: true, discounts, layout: "admin-layout", administator });
+});
+
+router.post("/edit-discount/:id", verifySignedIn, function (req, res) {
+  let discountsId = req.params.id;
+  adminHelper.updateDiscounts(discountsId, req.body).then(() => {
+    if (req.files) {
+      let image = req.files.Image;
+      if (image) {
+        image.mv("./public/images/discounts-images/" + discountsId + ".png");
+      }
+    }
+    res.redirect("/admin/discount/all-discounts");
+  });
+});
+
+router.post("/delete-discount/:id", verifySignedIn, async function (req, res) {
+  await db.get().collection(collections.DISCOUNTS_COLLECTION).deleteOne({ _id: ObjectId(req.params.id) });
+  res.redirect("/admin/discount/all-discounts");
+});
 
 
 

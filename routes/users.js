@@ -34,6 +34,15 @@ router.get("/all-rooms", async function (req, res, next) {
 });
 
 
+router.get("/offers", async function (req, res, next) {
+  let user = req.session.user;
+  let offers = await adminHelper.getAllDiscounts();
+  adminHelper.getAllrooms().then((rooms) => {
+    res.render("users/offers", { admin: false, offers, rooms, user });
+  });
+});
+
+
 
 // // Render Update Order Page
 // router.get("/update-order", (req, res) => {
