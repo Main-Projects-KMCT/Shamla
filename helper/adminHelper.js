@@ -541,6 +541,19 @@ module.exports = {
     });
   },
 
+  getAllROOOMs: () => {
+    return new Promise(async (resolve, reject) => {
+      let rooms = await db
+        .get()
+        .collection(collections.ROOM_COLLECTION)
+        .find()
+        .toArray();
+      resolve(rooms);
+    });
+  },
+
+
+
   doSignup: (adminData) => {
     return new Promise(async (resolve, reject) => {
       if (adminData.Code == "admin123") {
@@ -1022,6 +1035,10 @@ module.exports = {
   addDiscount: (discount, callback) => {
     console.log(discount);
     discount.createdAt = new Date();
+    if (discount.room) {
+      discount.room = new objectId(discount.room);
+    }
+
 
     db.get()
       .collection(collections.DISCOUNTS_COLLECTION)

@@ -651,7 +651,7 @@ router.post("/delete-category/:id", verifySignedIn, async function (req, res) {
 router.get("/all-payments", verifySignedIn, async function (req, res) {
   let administator = req.session.admin;
   let { fromDate, toDate } = req.query;
-  let orders = await adminHelper.getAllOrders(fromDate, toDate);
+  let orders = await staffHelper.getAllOrders(fromDate, toDate);
   res.render("admin/payment/all-payments", { admin: true, orders, layout: "admin-layout", administator });
 });
 
@@ -671,7 +671,7 @@ router.get("/all-discounts", verifySignedIn, function (req, res) {
 
 router.get("/add-discount", verifySignedIn, async function (req, res) {
   let administator = req.session.admin;
-  let rooms = await adminHelper.getAllrooms()
+  let rooms = await adminHelper.getAllROOOMs()
   res.render("admin/discount/add-discount", { admin: true, layout: "admin-layout", administator, rooms });
 });
 
@@ -739,8 +739,8 @@ router.get("/assign-staff", verifySignedIn, async function (req, res) {
   let administator = req.session.admin;
   let staffs = await adminHelper.getAllstaffs()
   let orders = await staffHelper.getAllOrders()
-  console.log("---",orders);
-  
+  console.log("---", orders);
+
   res.render("admin/staffs/assign-staff", { admin: true, staffs, orders, layout: "admin-layout", administator });
 });
 
