@@ -463,13 +463,13 @@ module.exports = {
     });
   },
 
-  getAllOrders: (staffId) => {
+  getAllOrders: () => {
     return new Promise(async (resolve, reject) => {
       try {
         let orders = await db
           .get()
           .collection(collections.ORDER_COLLECTION)
-          .find({ "staffId": objectId(staffId) }) // Filter by staff ID
+          .find()
           .sort({ createdAt: -1 })  // Sort by createdAt in descending order
           .toArray();
         resolve(orders);

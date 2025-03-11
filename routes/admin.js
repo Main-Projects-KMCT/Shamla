@@ -1,5 +1,7 @@
 var express = require("express");
 var adminHelper = require("../helper/adminHelper");
+var staffHelper = require("../helper/staffHelper");
+
 var fs = require("fs");
 const userHelper = require("../helper/userHelper");
 var router = express.Router();
@@ -719,7 +721,7 @@ router.post("/delete-discount/:id", verifySignedIn, async function (req, res) {
 router.get("/assigned-staffs", verifySignedIn, async function (req, res) {
   let administator = req.session.admin;
   let users = await adminHelper.getAllUsers()
-  let orders = await adminHelper.getAllOrders()
+  let orders = await staffHelper.getAllOrders()
   let assignstaffs = await adminHelper.getAllassigns()
   console.log("-------", assignstaffs);
 
@@ -736,7 +738,9 @@ router.post("/delete-assign/:id", verifySignedIn, async function (req, res) {
 router.get("/assign-staff", verifySignedIn, async function (req, res) {
   let administator = req.session.admin;
   let staffs = await adminHelper.getAllstaffs()
-  let orders = await adminHelper.getAllOrders()
+  let orders = await staffHelper.getAllOrders()
+  console.log("---",orders);
+  
   res.render("admin/staffs/assign-staff", { admin: true, staffs, orders, layout: "admin-layout", administator });
 });
 
