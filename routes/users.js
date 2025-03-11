@@ -111,16 +111,21 @@ router.get("/notifications", verifySignedIn, function (req, res) {
 });
 
 router.get("/about", async function (req, res) {
-  res.render("users/about", { admin: false, });
+  let user = req.session.user;
+  res.render("users/about", { admin: false, user });
 })
 
 
 router.get("/contact", async function (req, res) {
-  res.render("users/contact", { admin: false, });
+  let user = req.session.user;
+
+  res.render("users/contact", { admin: false, user });
 })
 
 router.get("/service", async function (req, res) {
-  res.render("users/service", { admin: false, });
+  let user = req.session.user;
+
+  res.render("users/service", { admin: false, user });
 })
 
 
@@ -590,6 +595,8 @@ router.post("/updateorder/:id", verifySignedIn, function (req, res) {
 
 
 router.get("/filter-rooms", async (req, res) => {
+  let user = req.session.user;
+
   try {
     let { priceRange, category, roomname } = req.query;
     let filters = {};
@@ -617,6 +624,7 @@ router.get("/filter-rooms", async (req, res) => {
       layout: "layout",
       rooms,
       categories,
+      user,
     });
   } catch (error) {
     console.error("Error filtering rooms:", error);

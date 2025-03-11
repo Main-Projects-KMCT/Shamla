@@ -69,14 +69,14 @@
                                 <label for="inputName5" class="form-label">Title <span
                                         class="text-danger">*</span></label>
                                 <input type="text" class="form-control" name="name" id="inputName5">
-                                {{!-- <select class="form-select" name="room" aria-label="Default select example"
-                                    required>
+                                <br>
+                                <select class="form-select" name="room" aria-label="Default select example" required>
                                     <option selected disabled>Select Room</option>
                                     {{#each rooms}}
-                                    <option value="{{this._id}}">{{this.name}}</option>
+                                    <option value="{{this._id}}">{{this.name}} - {{this.roomnumber}}</option>
                                     {{/each}}
 
-                                </select> --}}
+                                </select>
                             </div>
                             <label for="inputName5" class="form-label">Category<span
                                     class="text-danger">*</span></label>
