@@ -23,6 +23,29 @@ router.get("/", async function (req, res, next) {
     res.render("users/home", { admin: false, rooms, categories, user });
   });
 });
+router.get("/check-availability", async (req, res) => {
+  try {
+    console.log("!!!!!!!!!---checkkkkkkkkkkkkkk")
+      const { roomId, selecteddate } = req.query;
+      console.log("!!!!!!!!!checkkkkkkkkkkkkkkk",roomId, selecteddate)
+
+      if (!roomId || !selecteddate) {
+          return res.status(400).json({ error: "Missing roomId or selecteddate" });
+      }
+
+      const isAvailable = await userHelper.checkRoomAvailability(roomId, selecteddate);
+
+      if (isAvailable) {
+          return res.json({ available: true, message: "available" });
+      } else {
+          return res.json({ available: false, message: "Room is not available" });
+      }
+  } catch (error) {
+      console.error("Error checking room availability:", error);
+      res.status(500).json({ error: "Internal server error" });
+  } 
+});
+
 
 
 router.get("/all-rooms", async function (req, res, next) {

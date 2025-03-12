@@ -397,6 +397,18 @@ module.exports = {
     });
   },
 
+  checkRoomAvailability:async (roomId,selecteddate)=>{
+    let ordersCollection= await  db.get().collection(collections.ORDER_COLLECTION)
+    const existingBooking = await ordersCollection.findOne({
+      "room._id": objectId(roomId),
+      "deliveryDetails.selecteddate": selecteddate
+  });
+
+  console.log("existingBooking===",existingBooking,"existingBooking=====")
+
+  return !existingBooking; // Returns true if no matching order is found
+
+  },
 
 
 
