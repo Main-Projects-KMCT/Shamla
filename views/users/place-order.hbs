@@ -4,7 +4,7 @@
     }
 </style>
 
-<div class="page-content-wrapper py-3"><br>
+<div class="page-content-wrapper py-3">
     <div class="container-lg">
         <!-- Checkout Wrapper -->
         <div class="checkout-wrapper-area">
@@ -13,54 +13,40 @@
                     <div class="col-lg-6">
                         <div class="card shadow">
                             <div class="card-body">
-
                                 <h6 class="mb-3">Enter your billing details</h6>
-                                <input type="text" name="userId" value="{{user._id}}" hidden>
+                                <input type="hidden" name="userId" value="{{user._id}}">
                                 <input type="hidden" name="roomId" value="{{room._id}}">
 
                                 <div class="form-group">
                                     <input class="form-control mb-3" type="text" name="Fname"
-                                        value={{user.Fname}}{{user.Lname}} placeholder="Your full name">
+                                        value="{{user.Fname}} {{user.Lname}}" placeholder="Your full name">
                                 </div>
                                 <div class="form-group">
-                                    <input class="form-control mb-3" type="number" name="Phone" value={{user.Phone}}
+                                    <input class="form-control mb-3" type="number" name="Phone" value="{{user.Phone}}"
                                         placeholder="Your Number">
                                 </div>
                                 <div class="form-group">
-                                    <input class="form-control mb-3" type="email" name="Email" value={{user.Email}}
+                                    <input class="form-control mb-3" type="email" name="Email" value="{{user.Email}}"
                                         placeholder="Your email">
                                 </div>
-
                                 <div class="form-group">
-                                    <input class="form-control mb-3" type="text" name="Pincode" value={{user.Pincode}}
+                                    <input class="form-control mb-3" type="text" name="Pincode" value="{{user.Pincode}}"
                                         placeholder="Postcode or ZIP">
                                 </div>
                                 <div class="form-group">
-                                    <input class="form-control mb-3" type="text" name="District" value={{user.District}}
+                                    <input class="form-control mb-3" type="text" name="District" value="{{user.District}}"
                                         placeholder="Street address">
                                 </div>
-
-                                {{!-- <div class="form-group">
-                                    <input class="form-control mb-3" type="text" name="City" value={{user.City}}
-                                        placeholder="City">
-                                </div> --}}
-                                {{!-- <div class="form-group">
-                                    <textarea class="form-control mb-3" id="notes" name="Address" cols="30" rows="10"
-                                        placeholder="Address">{{user.Address}}</textarea>
-                                </div> --}}
-
                             </div>
                         </div>
 
                         <div class="card shadow mt-2">
                             <div class="card-body">
-
                                 <h6 class="mb-3">Addons</h6>
                                 <hr>
-
                                 <div class="form-group mb-3">
-                                    <label for="">Select Bedsheet Color</label>
-                                    <select class="form-select" name="bedsheet" aria-label="Default select example">
+                                    <label>Select Bedsheet Color</label>
+                                    <select class="form-select" name="bedsheet">
                                         <option selected value="not selected" disabled>Select Color</option>
                                         <option value="White">White</option>
                                         <option value="Dark Gray">Dark Gray</option>
@@ -68,46 +54,38 @@
                                         <option value="Pink">Pink</option>
                                     </select>
                                 </div>
-
                                 <div class="form-group mb-3">
-                                    <label for="">Select Extra Bed</label>
-                                    <select class="form-select" name="beds" aria-label="Default select example">
+                                    <label>Select Extra Bed</label>
+                                    <select class="form-select" name="beds">
                                         <option selected value="not selected" disabled>Select</option>
                                         <option value="1">1</option>
                                         <option value="2">2</option>
                                     </select>
                                 </div>
-
-
                                 <div class="form-group">
-                                    <label for="">Note</label>
-                                    <textarea class="form-control mb-3" id="notes" name="Note" cols="10" rows="2"
+                                    <label>Note</label>
+                                    <textarea class="form-control mb-3" name="Note" cols="10" rows="2"
                                         placeholder="Write Anything..."></textarea>
                                 </div>
-
                             </div>
                         </div>
                     </div>
+
                     <div class="col-lg-6">
                         <div class="card shadow mb-2 p-4">
                             <h6>Room Details</h6>
                             <hr>
-                            <h6>
-                                <div class="mb-2"><b>Room Name :</b> {{room.roomname}}<br></div>
-                                <div class="mb-2"><b>Price :</b> {{room.Price}}/-<br></div>
-                                <hr>
-                                <div class="mb-2"><b>Total Price :</b> <span class="text-danger">{{room.Price}}</span>
-                                    /-<br>
-
-                                    <div class="mb-2"><b>Advance Amount :</b> <span
-                                            class="text-danger">{{room.AdvPrice}}/-</span>
-                                    </div>
-
-                            </h6>
+                            <b>Room Name:</b> {{room.roomname}}<br>
+                            <b>Price:</b> {{room.Price}}/-<br>
+                            <hr>
+                            <b>Total Price:</b> <span class="text-danger">{{room.Price}}</span> /-<br>
+                            <b>Advance Amount:</b> <span class="text-danger">{{room.AdvPrice}}/-</span>
                         </div>
+
                         <div class="card shadow p-4">
                             <label>Select a date</label>
-                            <input type="date" class="form-control" name="selecteddate" id="dateInput" required />
+                            <input type="date" class="form-control" name="selecteddate" id="dateInput" required>
+                            <div id="availabilityMessage" style="color: red; display: none;"></div>
 
                             {{#if error}}
                             <div style="color: red;">
@@ -117,33 +95,64 @@
                             <hr>
                             <div class="form-check mb-2">
                                 <input class="form-check-input" type="radio" name="payment-method" value="COD" checked>
-                                <label class="form-check-label" for="darkRadio1">Booking (without payment)</label>
+                                <label>Booking (without payment)</label>
                             </div>
                             <div class="form-check mb-2">
                                 <input class="form-check-input" type="radio" name="payment-method" value="ONLINE">
-                                <label class="form-check-label" for="darkRadio2">Pay & Book</label>
+                                <label>Pay & Book</label>
                             </div>
-
                             <div class="form-check mb-2">
                                 <input class="form-check-input" type="radio" name="payment-method" value="ADVANCE">
-                                <label class="form-check-label" for="darkRadio2">Pay Advance
-                                    ({{room.AdvPrice}}/-)</label>
+                                <label>Pay Advance ({{room.AdvPrice}}/-)</label>
                             </div>
 
-                            <button class="btn btn-dark mt-3 w-100" type="submit">Book Now</button>
-
-                            <a href="/check-availability/?roomId={{room._id}}&selecteddate=2025-03-12" class="btn btn-dark mt-3 w-100 selecteddate" >check availability</a>
+                            <button id="smt" class="btn btn-dark mt-3 w-100" type="submit" disabled>Book Now</button>
             </form>
+            <button id="check" class="btn btn-dark mt-3 w-100">Check Availability</button>
         </div>
     </div>
 </div>
-</form>
 </div>
 </div>
-</div>
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
+<script>
+document.getElementById("check").addEventListener("click", async function (event) {
+    event.preventDefault();  // Prevents form submission on button click
+    const selectedDate = document.getElementById("dateInput").value;
+    const roomId = "{{room._id}}";
+
+    if (!selectedDate) {
+        alert("Please select a date first.");
+        return;
+    }
+
+    try {
+        const response = await fetch(`/check-availability/?roomId=${roomId}&selecteddate=${selectedDate}`);
+        const data = await response.json();
+        const availabilityMessage = document.getElementById("availabilityMessage");
+        const bookButton = document.getElementById("smt");
+
+        if (data.available) {
+            availabilityMessage.style.color = "green";
+            availabilityMessage.textContent = "Room is available!";
+            bookButton.disabled = false;
+        } else {
+            availabilityMessage.style.color = "red";
+            availabilityMessage.textContent = "Room is not available.";
+            bookButton.disabled = true;
+        }
+
+        availabilityMessage.style.display = "block";
+    } catch (error) {
+        console.error("Error checking availability:", error);
+        alert("Something went wrong! Please try again.");
+    }
+});
+</script>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
 
 <script>
     $("#checkout-form").submit((e) => {
