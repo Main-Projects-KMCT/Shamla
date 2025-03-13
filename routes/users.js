@@ -7,6 +7,26 @@ var db = require("../config/connection");
 var collections = require("../config/collections");
 const ObjectId = require("mongodb").ObjectID;
 
+const userMessage = [
+   ["hi", "hey", "hello"],
+    ["sure", "yes", "no"],
+    ["room availability", "is there any room available", "can I book a room"],
+    ["rooms" ,"room types", "what kind of rooms do you have"],
+    ["offers", "do you have any discounts", "any special deals"],
+    ["contact", "how can I reach you"],
+];
+
+const botReply = [
+   ["Hello!", "Hi!", "Hey!", "Hi there!"],
+    ["Okay"],
+    ["Please provide check-in date, check-out date, and number of guests."],
+    ["We have Single, Double, and Suite rooms. Check here: http://localhost:4001/filter-rooms"],
+    ["Check out our latest offers here: http://localhost:4001/offers"],
+    ["You can contact us at /contact"],
+];
+
+const fallbackReply = "I did not get that, please contact support.";
+
 const verifySignedIn = (req, res, next) => {
   if (req.session.signedIn) {
     next();
@@ -23,6 +43,34 @@ router.get("/", async function (req, res, next) {
     res.render("users/home", { admin: false, rooms, categories, user });
   });
 });
+router.post("/chatbot", async (req, res) => {
+  console.log(req.body,"chat::",req.body.message)
+  const userInput = req.body.message.toLowerCase();
+  
+  let reply = fallbackReply;
+  for (let i = 0; i < userMessage.length; i++) {
+      if (userMessage[i].some(msg => userInput.includes(msg))) {
+          reply = botReply[i][0];
+          break;
+      }
+  }
+  
+  if (userInput.includes("room availability")) {
+      const { checkin, checkout, guests } = req.query;
+      if (!checkin || !checkout || !guests) {
+          return res.json({ reply: "Please provide check-in date, check-out date, and number of guests." });
+      }
+      try {
+          const response = await axios.get(`https://api.example.com/rooms?checkin=${checkin}&checkout=${checkout}&guests=${guests}`);
+          reply = response.data.length ? `Available rooms: ${response.data.map(r => r.name).join(", ")}` : "No rooms available.";
+      } catch (error) {
+          reply = "Error fetching availability. Please try again later.";
+      }
+  }
+  console.log("reppp ",reply)
+  res.json({ reply });
+});
+
 router.get("/check-availability", async (req, res) => {
   try {
     console.log("!!!!!!!!!---checkkkkkkkkkkkkkk")
