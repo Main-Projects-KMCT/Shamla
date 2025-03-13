@@ -5,6 +5,7 @@ var adminHelper = require("../helper/adminHelper");
 var router = express.Router();
 var db = require("../config/connection");
 var collections = require("../config/collections");
+const { default: axios } = require("axios");
 const ObjectId = require("mongodb").ObjectID;
 
 const userMessage = [
@@ -27,6 +28,31 @@ const botReply = [
 
 const fallbackReply = "I did not get that, please contact support.";
 
+
+const AI_API_URL = "https://api.together.xyz/v1/completions";
+const AI_API_KEY = "f4a911ae033eb1b34093cc4d80e28881270d57f6626d605a0a1727fc169f95e9";
+
+async function getAIResponse(userInput, settings) {
+  try {
+    const response = await axios.post(
+      AI_API_URL,
+      {
+        model: "mistralai/Mistral-7B-Instruct-v0.1",
+        prompt: `${settings.prompt}\nUser: ${userInput}\nAI:`,
+        max_tokens: 200,
+      },
+      {
+        headers: { Authorization: `Bearer ${AI_API_KEY}` },
+      }
+    );
+    return response.data.choices[0].text.trim();
+  } catch (error) {
+    console.error("AI response error:", error);
+    return "I'm facing an issue understanding your request. Please try again later.";
+  }
+}
+
+
 const verifySignedIn = (req, res, next) => {
   if (req.session.signedIn) {
     next();
@@ -43,33 +69,80 @@ router.get("/", async function (req, res, next) {
     res.render("users/home", { admin: false, rooms, categories, user });
   });
 });
+// router.post("/chatbot", async (req, res) => {
+//   const userInput = req.body.message.toLowerCase();
+  
+//   let reply = fallbackReply;
+//   for (let i = 0; i < userMessage.length; i++) {
+//       if (userMessage[i].some(msg => userInput.includes(msg))) {
+//           reply = botReply[i][0];
+//           break;
+//       }
+//   }
+  
+//   if (userInput.includes("room availability")) {
+//       const { checkin, checkout, guests } = req.query;
+//       if (!checkin || !checkout || !guests) {
+//           return res.json({ reply: "Please provide check-in date, check-out date, and number of guests." });
+//       }
+//       try {
+//           const response = await axios.get(`https://api.example.com/rooms?checkin=${checkin}&checkout=${checkout}&guests=${guests}`);
+//           reply = response.data.length ? `Available rooms: ${response.data.map(r => r.name).join(", ")}` : "No rooms available.";
+//       } catch (error) {
+//           reply = "Error fetching availability. Please try again later.";
+//       }
+//   }
+//   res.json({ reply });
+// });
+
+
 router.post("/chatbot", async (req, res) => {
-  console.log(req.body,"chat::",req.body.message)
-  const userInput = req.body.message.toLowerCase();
-  
-  let reply = fallbackReply;
-  for (let i = 0; i < userMessage.length; i++) {
+  try {
+    const userInput = req.body.message?.toLowerCase() || "";
+    if (!userInput) {
+      return res.json({ reply: "Please enter a valid message." });
+    }
+
+    let reply = fallbackReply;
+
+    // Check for predefined responses
+    for (let i = 0; i < userMessage.length; i++) {
       if (userMessage[i].some(msg => userInput.includes(msg))) {
-          reply = botReply[i][0];
-          break;
+        reply = botReply[i][0];
+        break;
       }
-  }
-  
-  if (userInput.includes("room availability")) {
-      const { checkin, checkout, guests } = req.query;
+    }
+
+    // Handle room availability query
+    if (userInput.includes("room availability")) {
+      const { checkin, checkout, guests } = req.body; // Expecting data in request body
       if (!checkin || !checkout || !guests) {
-          return res.json({ reply: "Please provide check-in date, check-out date, and number of guests." });
+        return res.json({ reply: "Please provide check-in date, check-out date, and number of guests." });
       }
       try {
-          const response = await axios.get(`https://api.example.com/rooms?checkin=${checkin}&checkout=${checkout}&guests=${guests}`);
-          reply = response.data.length ? `Available rooms: ${response.data.map(r => r.name).join(", ")}` : "No rooms available.";
+        const response = await axios.get(
+          `https://api.example.com/rooms?checkin=${checkin}&checkout=${checkout}&guests=${guests}`
+        );
+        reply = response.data.length ? `Available rooms: ${response.data.map(r => r.name).join(", ")}` : "No rooms available.";
       } catch (error) {
-          reply = "Error fetching availability. Please try again later.";
+        console.error("Room availability error:", error);
+        reply = "Error fetching room availability. Please try again later.";
       }
+    }
+
+    // If no predefined response, get AI-generated response
+    if (reply === fallbackReply) {
+      const settings = await adminHelper.getAIChatbotSettings();
+      reply = await getAIResponse(userInput, settings);
+    }
+
+    res.json({ reply });
+  } catch (error) {
+    console.error("Chatbot error:", error);
+    res.status(500).json({ reply: "An error occurred. Please try again later." });
   }
-  console.log("reppp ",reply)
-  res.json({ reply });
 });
+
 
 router.get("/check-availability", async (req, res) => {
   try {

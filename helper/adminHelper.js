@@ -1059,4 +1059,29 @@ module.exports = {
       resolve(discounts);
     });
   },
+  getAIChatbotSettings: () => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const settings = await db.get().collection(collections.SETTINGS_COLLECTION).findOne({ type: 'ai-chatbot' });
+        resolve(settings || { prompt: '' });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
+  updateAIChatbotSettings: (settings) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        await db.get().collection(collections.SETTINGS_COLLECTION).updateOne(
+          { type: 'ai-chatbot' },
+          { $set: settings },
+          { upsert: true }
+        );
+        resolve();
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
 }

@@ -751,5 +751,25 @@ router.post("/assign-staff", async function (req, res) {
   });
 });
 
+// AI Chatbot settings page
+router.get('/ai-chatbot-settings', verifySignedIn, async (req, res) => {
+  let administator = req.session.admin;
+  const settings = await adminHelper.getAIChatbotSettings();
+  res.render('admin/ai-chatbot-settings', { admin: true, layout: 'admin-layout', administator, settings });
+});
+
+// Update AI Chatbot settings
+router.post('/ai-chatbot-settings', verifySignedIn, async (req, res) => {
+  try {
+    const { prompt } = req.body;
+    await adminHelper.updateAIChatbotSettings({ prompt });
+    res.redirect('/admin/ai-chatbot-settings');
+  } catch (error) {
+    console.error('Error updating AI chatbot settings:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
 
 module.exports = router;
