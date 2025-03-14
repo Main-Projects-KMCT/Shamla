@@ -49,6 +49,17 @@ app.engine(
         const year = date.getFullYear();
         return `${day}-${month}-${year}`; // Return the formatted date
       },
+      formatFacilities:  function (text) {
+        if (!text) return ""; // Handle empty input
+
+        const listItems = text
+            .split("*") // Split based on '*'
+            .filter(item => item.trim() !== "") // Remove empty entries
+            .map(item => `<li>${item.trim()}</li>`) // Wrap in <li>
+            .join(""); // Join all items
+    
+        return `<ul class="facilities-list">${listItems}</ul>`; // Return as SafeString
+    }
     },
   })
 );

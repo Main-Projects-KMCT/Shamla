@@ -330,6 +330,13 @@ router.get("/all-rooms", verifySignedIn, function (req, res) {
   });
 });
 
+router.get("/reports",verifySignedIn, function (req, res) {
+  let administator = req.session.admin;
+  // adminHelper.getAllrooms().then((rooms) => {
+    res.render("admin/reports", { admin: true, layout: "admin-layout", administator });
+  // });
+})
+
 router.get("/add-room", verifySignedIn, async function (req, res) {
   let administator = req.session.admin;
   let categories = await adminHelper.getAllCategories();
@@ -496,6 +503,31 @@ router.get("/remove-all-users", verifySignedIn, function (req, res) {
   adminHelper.removeAllUsers().then(() => {
     res.redirect("/admin/all-users");
   });
+});
+
+router.get("/booking-report", verifySignedIn, async function (req, res) {
+  let administator = req.session.admin;
+
+  // Extract filters from query params
+  let { fromDate, toDate } = req.query;
+
+  let filters = { fromDate, toDate};
+
+  try {
+    let orders = await adminHelper.getAllOrders(filters);
+
+    res.render("admin/report-view", {
+      admin: true,
+      layout: "admin-layout",
+      administator,
+      orders,
+      reportName:"Booking",
+      filters  // Send filters to retain values in the form
+    });
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+    res.status(500).send("Server Error");
+  }
 });
 
 router.get("/all-orders", verifySignedIn, async function (req, res) {

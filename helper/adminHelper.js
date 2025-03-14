@@ -767,24 +767,24 @@ module.exports = {
         }
 
         // Selected Date Filtering
-        if (filters.selecteddate) {
-          query["deliveryDetails.selecteddate"] = filters.selecteddate;
-        }
+        // if (filters.selecteddate) {
+        //   query["deliveryDetails.selecteddate"] = filters.selecteddate;
+        // }
 
         // Total Amount Filtering
-        if (filters.totalAmount) {
-          query.totalAmount = parseFloat(filters.totalAmount); // Ensure it's a number
-        }
+        // if (filters.totalAmount) {
+        //   query.totalAmount = parseFloat(filters.totalAmount); // Ensure it's a number
+        // }
 
         // Placed By (User ID) Filtering
-        if (filters.userId) {
-          query["user._id"] = filters.userId;
-        }
+        // if (filters.userId) {
+        //   query["user._id"] = filters.userId;
+        // }
 
         // Room Number Filtering
-        if (filters.roomNumber) {
-          query["room.roomnumber"] = filters.roomNumber;
-        }
+        // if (filters.roomNumber) {
+        //   query["room.roomnumber"] = filters.roomNumber;
+        // }
 
         let orders = await db.get()
           .collection(collections.ORDER_COLLECTION)
