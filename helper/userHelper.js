@@ -225,13 +225,14 @@ module.exports = {
         // Set default values
         userData.isDisable = false;  // User is not disabled by default
         userData.createdAt = new Date();  // Set createdAt to the current date and time
-
+console.log("dosi------------")
         // Insert the user into the database
         db.get()
           .collection(collections.USERS_COLLECTION)
           .insertOne(userData)
           .then((data) => {
             // Resolve with the inserted user data
+            console.log("resolved ^^^^^^^^^^^")
             resolve(data.ops[0]);
           })
           .catch((err) => {

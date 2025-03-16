@@ -588,7 +588,7 @@ router.get("/change-status/", verifySignedIn, async function (req, res) {
       const message = encodeURIComponent(
         `✅ Your booking has been CONFIRMED!\n\nThank you for choosing us! 🏨`
       );
-      return res.redirect(`https://wa.me/${phone}?text=${message}`);
+      return res.redirect(`https://wa.me/+91${phone}?text=${message}`);
     }
 
     if (status === "Declined" && phone) {
