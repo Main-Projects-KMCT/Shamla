@@ -114,33 +114,6 @@ router.get("/offers", async function (req, res, next) {
 });
 
 
-
-// // Render Update Order Page
-// router.get("/update-order", (req, res) => {
-//   res.render("users/updateorder");
-// });
-
-// // Update Order API
-// router.put("/update-order/:userId", async (req, res) => {
-//   const { userId } = req.params;
-//   const updatedData = req.body;
-
-//   try {
-//     const result = await orderHelper.updateOrder(userId, updatedData);
-//     res.json(result);
-//   } catch (error) {
-//     res.status(500).json({ success: false, message: "Internal Server Error", error });
-//   }
-// });
-
-// router.get("/rooms/:id", async function (req, res, next) {
-//   let user = req.session.user;
-//   let categories = await adminHelper.getAllCategories();
-//   adminHelper.getAllrooms().then((rooms) => {
-//     res.render("users/rooms", { admin: false, categories, rooms, user });
-//   });
-// });
-
 router.get("/rooms/:id", async (req, res) => {
   let user = req.session.user;
   try {
@@ -153,20 +126,6 @@ router.get("/rooms/:id", async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 });
-
-
-// router.get("/rooms/:categoryId", async (req, res) => {
-//   try {
-//     let categoryId = req.params.categoryId; // Get category ID from URL
-//     let rooms = await roomHelpers.getRoomsByCategory(categoryId); // Fetch rooms
-
-//     res.render("rooms", { rooms }); // Render rooms page with filtered rooms
-//   } catch (error) {
-//     console.error("Error fetching rooms by category:", error);
-//     res.status(500).send("Internal Server Error");
-//   }
-// });
-
 
 
 router.get("/notifications", verifySignedIn, function (req, res) {
@@ -631,18 +590,6 @@ router.get("/cancel-order/:id", verifySignedIn, function (req, res) {
   });
 });
 
-router.post("/search", verifySignedIn, async function (req, res) {
-  let user = req.session.user;
-  let userId = req.session.user._id;
-  // le = await userHelper.g(userId);
-  userHelper.searchProduct(req.body).then((response) => {
-    res.render("users/search-result", { admin: false, user, response });
-  });
-});
-
-
-
-
 
 router.get("/updateorder/:id", verifySignedIn, async function (req, res) {
   let user = req.session.user;
@@ -668,6 +615,8 @@ router.post("/updateorder/:id", verifySignedIn, function (req, res) {
 router.get("/filter-rooms", async (req, res) => {
   let user = req.session.user;
 
+  console.log(req.query,"--req.query,body---", req.body); // Debugging
+
   try {
     let { priceRange, category, roomname } = req.query;
     let filters = {};
@@ -688,7 +637,7 @@ router.get("/filter-rooms", async (req, res) => {
 
     // Fetch rooms and categories
     let categories = await adminHelper.getAllCategories();
-    let rooms = await adminHelper.getFilteredRooms(filters);
+    let rooms = await adminHelper.getFilteredRooms(filters,priceRange);
 
     res.render("users/filter-rooms", {
       admin: false,

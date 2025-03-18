@@ -205,17 +205,7 @@ module.exports = {
     });
   },
 
-  getAllProducts: () => {
-    return new Promise(async (resolve, reject) => {
-      let products = await db
-        .get()
-        .collection(collections.PRODUCTS_COLLECTION)
-        .find()
-        .toArray();
-      resolve(products);
-    });
-  },
-
+  
   doSignup: (userData) => {
     return new Promise(async (resolve, reject) => {
       try {
@@ -322,56 +312,6 @@ module.exports = {
         });
     });
   },
-
-
-  getTotalAmount: (userId) => {
-    return new Promise(async (resolve, reject) => {
-      let total = await db
-        .get()
-        .collection(collections.CART_COLLECTION)
-        .aggregate([
-          {
-            $match: { user: objectId(userId) },
-          },
-          {
-            $unwind: "$products",
-          },
-          {
-            $project: {
-              item: "$products.item",
-              quantity: "$products.quantity",
-            },
-          },
-          {
-            $lookup: {
-              from: collections.PRODUCTS_COLLECTION,
-              localField: "item",
-              foreignField: "_id",
-              as: "product",
-            },
-          },
-          {
-            $project: {
-              item: 1,
-              quantity: 1,
-              product: { $arrayElemAt: ["$product", 0] },
-            },
-          },
-          {
-            $group: {
-              _id: null,
-              total: { $sum: { $multiply: ["$quantity", "$product.Price"] } },
-            },
-          },
-        ])
-        .toArray();
-      console.log(total[0].total);
-      resolve(total[0].total);
-    });
-  },
-
-
-
 
   getRoomDetails: (roomId) => {
     return new Promise((resolve, reject) => {
@@ -696,25 +636,4 @@ module.exports = {
     });
   },
 
-
-  searchProduct: (details) => {
-    console.log(details);
-    return new Promise(async (resolve, reject) => {
-      db.get()
-        .collection(collections.PRODUCTS_COLLECTION)
-        .createIndex({ Name: "text" }).then(async () => {
-          let result = await db
-            .get()
-            .collection(collections.PRODUCTS_COLLECTION)
-            .find({
-              $text: {
-                $search: details.search,
-              },
-            })
-            .toArray();
-          resolve(result);
-        })
-
-    });
-  },
 };

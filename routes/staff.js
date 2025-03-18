@@ -348,27 +348,6 @@ router.get(
 
 
 
-router.get("/cancel-order/:id", verifySignedIn, function (req, res) {
-  let orderId = req.params.id;
-  staffHelper.cancelOrder(orderId).then(() => {
-    res.redirect("/staff/all-orders");
-  });
-});
-
-router.get("/cancel-all-orders", verifySignedIn, function (req, res) {
-  staffHelper.cancelAllOrders().then(() => {
-    res.redirect("/staff/all-orders");
-  });
-});
-
-router.post("/search", verifySignedIn, function (req, res) {
-  let staff = req.session.staff;
-  staffHelper.searchProduct(req.body).then((response) => {
-    res.render("staff/search-result", { staff: true, layout: "layout", workspace, response });
-  });
-});
-
-
 router.get("/bookings", verifySignedIn, async function (req, res) {
   let staff = req.session.staff;
   let { fromDate, toDate } = req.query;

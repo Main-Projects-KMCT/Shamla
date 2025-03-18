@@ -578,21 +578,6 @@ router.get("/all-orders", verifySignedIn, async function (req, res) {
 
 
 
-router.get(
-  "/view-ordered-products/:id",
-  verifySignedIn,
-  async function (req, res) {
-    let administator = req.session.admin;
-    let orderId = req.params.id;
-    let products = await userHelper.getOrderProducts(orderId);
-    res.render("admin/order-products", {
-      admin: true, layout: "admin-layout",
-      administator,
-      products,
-    });
-  }
-);
-
 router.get("/change-status/", verifySignedIn, async function (req, res) {
 
   try {
@@ -640,12 +625,6 @@ router.get("/cancel-all-orders", verifySignedIn, function (req, res) {
   });
 });
 
-router.post("/search", verifySignedIn, function (req, res) {
-  let administator = req.session.admin;
-  adminHelper.searchProduct(req.body).then((response) => {
-    res.render("admin/search-result", { admin: true, layout: "admin-layout", administator, response });
-  });
-});
 
 
 

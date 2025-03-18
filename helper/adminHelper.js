@@ -8,10 +8,13 @@ module.exports = {
 
 
 
-  getFilteredRooms: async (filters) => {
+  getFilteredRooms: async (filters,priceRange) => {
+    console.log("priceRange:",priceRange,":priceRange")
+
     try {
       // ✅ Convert stored price values to numbers
-      return await db.get()
+      if (priceRange) {
+        return await db.get()
         .collection(collections.ROOM_COLLECTION)
         .aggregate([
           {
@@ -24,6 +27,17 @@ module.exports = {
           }
         ])
         .toArray();
+      }else{
+        return await db.get()
+        .collection(collections.ROOM_COLLECTION)
+        .aggregate([
+          {
+            $match: filters
+          }
+        ])
+        .toArray();
+      }
+      
     } catch (error) {
       console.error("Error fetching filtered rooms:", error);
       return [];
@@ -584,31 +598,6 @@ roomsPerCategory: () => {
     });
   },
 
-
-
-  addProduct: (product, callback) => {
-    console.log(product);
-    product.Price = parseInt(product.Price);
-    db.get()
-      .collection(collections.PRODUCTS_COLLECTION)
-      .insertOne(product)
-      .then((data) => {
-        console.log(data);
-        callback(data.ops[0]._id);
-      });
-  },
-
-  getAllProducts: () => {
-    return new Promise(async (resolve, reject) => {
-      let products = await db
-        .get()
-        .collection(collections.PRODUCTS_COLLECTION)
-        .find()
-        .toArray();
-      resolve(products);
-    });
-  },
-
   getAllROOOMs: () => {
     return new Promise(async (resolve, reject) => {
       let rooms = await db
@@ -664,16 +653,7 @@ roomsPerCategory: () => {
     });
   },
 
-  getProductDetails: (productId) => {
-    return new Promise((resolve, reject) => {
-      db.get()
-        .collection(collections.PRODUCTS_COLLECTION)
-        .findOne({ _id: objectId(productId) })
-        .then((response) => {
-          resolve(response);
-        });
-    });
-  },
+ 
 
 
   getCategoryDetails: (categoryId) => {
@@ -687,50 +667,9 @@ roomsPerCategory: () => {
     });
   },
 
-  deleteProduct: (productId) => {
-    return new Promise((resolve, reject) => {
-      db.get()
-        .collection(collections.PRODUCTS_COLLECTION)
-        .removeOne({ _id: objectId(productId) })
-        .then((response) => {
-          console.log(response);
-          resolve(response);
-        });
-    });
-  },
+ 
 
-  updateProduct: (productId, productDetails) => {
-    return new Promise((resolve, reject) => {
-      db.get()
-        .collection(collections.PRODUCTS_COLLECTION)
-        .updateOne(
-          { _id: objectId(productId) },
-          {
-            $set: {
-              Name: productDetails.Name,
-              Category: productDetails.Category,
-              Price: productDetails.Price,
-              Description: productDetails.Description,
-            },
-          }
-        )
-        .then((response) => {
-          resolve();
-        });
-    });
-  },
-
-  deleteAllProducts: () => {
-    return new Promise((resolve, reject) => {
-      db.get()
-        .collection(collections.PRODUCTS_COLLECTION)
-        .remove({})
-        .then(() => {
-          resolve();
-        });
-    });
-  },
-
+  
   getAllUsers: () => {
     return new Promise(async (resolve, reject) => {
       try {
@@ -965,32 +904,6 @@ roomsPerCategory: () => {
         });
     });
   },
-
-  searchProduct: (details) => {
-    console.log(details);
-    return new Promise(async (resolve, reject) => {
-      db.get()
-        .collection(collections.PRODUCTS_COLLECTION)
-        .createIndex({ Name: "text" }).then(async () => {
-          let result = await db
-            .get()
-            .collection(collections.PRODUCTS_COLLECTION)
-            .find({
-              $text: {
-                $search: details.search,
-              },
-            })
-            .toArray();
-          resolve(result);
-        })
-
-    });
-  },
-
-
-
-
-
   getAllassigns: () => {
     return new Promise(async (resolve, reject) => {
       try {

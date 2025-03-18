@@ -169,109 +169,7 @@ module.exports = {
     });
   },
 
-  ///////ADD workspace/////////////////////                                         
-  addworkspace: (workspace, staffId, callback) => {
-    if (!staffId || !objectId.isValid(staffId)) {
-      return callback(null, new Error("Invalid or missing staffId"));
-    }
-
-    workspace.Price = parseInt(workspace.Price);
-    workspace.staffId = objectId(staffId); // Associate workspace with the staff
-
-    db.get()
-      .collection(collections.WORKSPACE_COLLECTION)
-      .insertOne(workspace)
-      .then((data) => {
-        callback(data.ops[0]._id); // Return the inserted workspace ID
-      })
-      .catch((error) => {
-        callback(null, error);
-      });
-  },
-
-
-  ///////GET ALL workspace/////////////////////                                            
-  getAllworkspaces: (staffId) => {
-    return new Promise(async (resolve, reject) => {
-      let workspaces = await db
-        .get()
-        .collection(collections.WORKSPACE_COLLECTION)
-        .find({ staffId: objectId(staffId) }) // Filter by staffId
-        .toArray();
-      resolve(workspaces);
-    });
-  },
-
-  ///////ADD workspace DETAILS/////////////////////                                            
-  getworkspaceDetails: (workspaceId) => {
-    return new Promise((resolve, reject) => {
-      db.get()
-        .collection(collections.WORKSPACE_COLLECTION)
-        .findOne({
-          _id: objectId(workspaceId)
-        })
-        .then((response) => {
-          resolve(response);
-        });
-    });
-  },
-
-  ///////DELETE workspace/////////////////////                                            
-  deleteworkspace: (workspaceId) => {
-    return new Promise((resolve, reject) => {
-      db.get()
-        .collection(collections.WORKSPACE_COLLECTION)
-        .removeOne({
-          _id: objectId(workspaceId)
-        })
-        .then((response) => {
-          console.log(response);
-          resolve(response);
-        });
-    });
-  },
-
-  ///////UPDATE workspace/////////////////////                                            
-  updateworkspace: (workspaceId, workspaceDetails) => {
-    return new Promise((resolve, reject) => {
-      db.get()
-        .collection(collections.WORKSPACE_COLLECTION)
-        .updateOne(
-          {
-            _id: objectId(workspaceId)
-          },
-          {
-            $set: {
-              wname: workspaceDetails.wname,
-              seat: workspaceDetails.seat,
-              Price: workspaceDetails.Price,
-              format: workspaceDetails.format,
-              desc: workspaceDetails.desc,
-              baddress: workspaceDetails.baddress,
-
-            },
-          }
-        )
-        .then((response) => {
-          resolve();
-        });
-    });
-  },
-
-
-  ///////DELETE ALL workspace/////////////////////                                            
-  deleteAllworkspaces: () => {
-    return new Promise((resolve, reject) => {
-      db.get()
-        .collection(collections.WORKSPACE_COLLECTION)
-        .remove({})
-        .then(() => {
-          resolve();
-        });
-    });
-  },
-
-
+ 
   assignRoomToUser: (room, callback) => {
     console.log(room);
 
@@ -314,28 +212,7 @@ module.exports = {
       });
   },
 
-  addProduct: (product, callback) => {
-    console.log(product);
-    product.Price = parseInt(product.Price);
-    db.get()
-      .collection(collections.PRODUCTS_COLLECTION)
-      .insertOne(product)
-      .then((data) => {
-        console.log(data);
-        callback(data.ops[0]._id);
-      });
-  },
-
-  getAllProducts: () => {
-    return new Promise(async (resolve, reject) => {
-      let products = await db
-        .get()
-        .collection(collections.PRODUCTS_COLLECTION)
-        .find()
-        .toArray();
-      resolve(products);
-    });
-  },
+  
 
   dosignup: (staffData) => {
     return new Promise(async (resolve, reject) => {
@@ -387,63 +264,6 @@ module.exports = {
       }
     });
   },
-
-
-  getProductDetails: (productId) => {
-    return new Promise((resolve, reject) => {
-      db.get()
-        .collection(collections.PRODUCTS_COLLECTION)
-        .findOne({ _id: objectId(productId) })
-        .then((response) => {
-          resolve(response);
-        });
-    });
-  },
-
-  deleteProduct: (productId) => {
-    return new Promise((resolve, reject) => {
-      db.get()
-        .collection(collections.PRODUCTS_COLLECTION)
-        .removeOne({ _id: objectId(productId) })
-        .then((response) => {
-          console.log(response);
-          resolve(response);
-        });
-    });
-  },
-
-  updateProduct: (productId, productDetails) => {
-    return new Promise((resolve, reject) => {
-      db.get()
-        .collection(collections.PRODUCTS_COLLECTION)
-        .updateOne(
-          { _id: objectId(productId) },
-          {
-            $set: {
-              Name: productDetails.Name,
-              Category: productDetails.Category,
-              Price: productDetails.Price,
-              Description: productDetails.Description,
-            },
-          }
-        )
-        .then((response) => {
-          resolve();
-        });
-    });
-  },
-
-  deleteAllProducts: () => {
-    return new Promise((resolve, reject) => {
-      db.get()
-        .collection(collections.PRODUCTS_COLLECTION)
-        .remove({})
-        .then(() => {
-          resolve();
-        });
-    });
-  },
-
   getAllUsers: () => {
     return new Promise(async (resolve, reject) => {
       let users = await db
@@ -513,94 +333,7 @@ module.exports = {
     });
   },
 
-  cancelOrder: async (orderId) => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        // Fetch the order to get the associated workspace ID
-        const order = await db.get()
-          .collection(collections.ORDER_COLLECTION)
-          .findOne({ _id: objectId(orderId) });
-
-        if (!order) {
-          return reject(new Error("Order not found."));
-        }
-
-        const workspaceId = order.workspace._id; // Get the workspace ID from the order
-
-        // Remove the order from the database
-        await db.get()
-          .collection(collections.ORDER_COLLECTION)
-          .deleteOne({ _id: objectId(orderId) });
-
-        // Get the current seat count from the workspace
-        const workspaceDoc = await db.get()
-          .collection(collections.WORKSPACE_COLLECTION)
-          .findOne({ _id: objectId(workspaceId) });
-
-        // Check if the seat field exists and is a string
-        if (workspaceDoc && workspaceDoc.seat) {
-          let seatCount = Number(workspaceDoc.seat); // Convert seat count from string to number
-
-          // Check if the seatCount is a valid number
-          if (!isNaN(seatCount)) {
-            seatCount += 1; // Increment the seat count
-
-            // Convert back to string and update the workspace seat count
-            await db.get()
-              .collection(collections.WORKSPACE_COLLECTION)
-              .updateOne(
-                { _id: objectId(workspaceId) },
-                { $set: { seat: seatCount.toString() } } // Convert number back to string
-              );
-
-            resolve(); // Successfully updated the seat count
-          } else {
-            return reject(new Error("Seat count is not a valid number."));
-          }
-        } else {
-          return reject(new Error("Workspace not found or seat field is missing."));
-        }
-      } catch (error) {
-        console.error("Error canceling order:", error);
-        reject(error);
-      }
-    });
-  },
-
-
-  cancelAllOrders: () => {
-    return new Promise((resolve, reject) => {
-      db.get()
-        .collection(collections.ORDER_COLLECTION)
-        .remove({})
-        .then(() => {
-          resolve();
-        });
-    });
-  },
-
-  searchProduct: (details) => {
-    console.log(details);
-    return new Promise(async (resolve, reject) => {
-      db.get()
-        .collection(collections.PRODUCTS_COLLECTION)
-        .createIndex({ Name: "text" }).then(async () => {
-          let result = await db
-            .get()
-            .collection(collections.PRODUCTS_COLLECTION)
-            .find({
-              $text: {
-                $search: details.search,
-              },
-            })
-            .toArray();
-          resolve(result);
-        })
-
-    });
-  },
-
-
+ 
   cancelAssign: (assignId) => {
     return new Promise(async (resolve, reject) => {
       try {
