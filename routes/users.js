@@ -242,12 +242,13 @@ router.get("/signup", function (req, res) {
 
 router.post("/signup", async function (req, res) {
   const { Fname, Email, Phone, Address, Pincode, District, Password } = req.body;
-  let errors = {};
-
+  let errors = {}; 
+  console.log(req.body,"posttttt-sign")
   // Check if email already exists
   const existingEmail = await db.get()
     .collection(collections.USERS_COLLECTION)
     .findOne({ Email });
+    console.log(existingEmail,"*****-sign")
 
   if (existingEmail) {
     errors.email = "This email is already registered.";
@@ -289,6 +290,7 @@ router.post("/signup", async function (req, res) {
       errors.password = "Password must be at least 8 characters long and include an uppercase letter, a lowercase letter, a number, and a special character.";
     }
   }
+  console.log(errors,"errrrrrrrr")
 
   if (Object.keys(errors).length > 0) {
     return res.render("users/signup", {
