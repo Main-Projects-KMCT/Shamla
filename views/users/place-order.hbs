@@ -6,7 +6,6 @@
 
 <div class="page-content-wrapper py-3">
     <div class="container-lg">
-        <!-- Checkout Wrapper -->
         <div class="checkout-wrapper-area">
             <form id="checkout-form">
                 <div class="row g-2">
@@ -29,14 +28,6 @@
                                     <input class="form-control mb-3" type="email" name="Email" value="{{user.Email}}"
                                         placeholder="Your email">
                                 </div>
-                                <div class="form-group">
-                                    <input class="form-control mb-3" type="text" name="Pincode" value="{{user.Pincode}}"
-                                        placeholder="Postcode or ZIP">
-                                </div>
-                                <div class="form-group">
-                                    <input class="form-control mb-3" type="text" name="District" value="{{user.District}}"
-                                        placeholder="Street address">
-                                </div>
                             </div>
                         </div>
 
@@ -54,7 +45,7 @@
                                         <option value="Pink">Pink</option>
                                     </select>
                                 </div>
-                                <div class="form-group mb-3">
+                                 <div class="form-group mb-3">
                                     <label>Select Extra Bed</label>
                                     <select class="form-select" name="beds">
                                         <option selected value="not selected" disabled>Select</option>
@@ -76,23 +67,11 @@
                             <h6>Room Details</h6>
                             <hr>
                             <b>Room Name:</b> {{room.roomname}}<br>
-                            <b>Price:</b> {{room.Price}}/-<br>
-                            <hr>
-                            <b>Total Price:</b> <span class="text-danger">{{room.Price}}</span> /-<br>
-                            <b>Advance Amount:</b> <span class="text-danger">{{room.AdvPrice}}/-</span>
+                            <b>Price per Night:</b> {{room.Price}}/-<br>
                         </div>
 
                         <div class="card shadow p-4">
-                            <label>Select a date</label>
-                            <input type="date" class="form-control" name="selecteddate" id="dateInput" required>
-                            <div id="availabilityMessage" style="color: red; display: none;"></div>
-
-                            {{#if error}}
-                            <div style="color: red;">
-                                <strong>{{error}}</strong>
-                            </div>
-                            {{/if}}
-                            <hr>
+                             <hr>
                             <div class="form-check mb-2">
                                 <input class="form-check-input" type="radio" name="payment-method" value="COD" checked>
                                 <label>Booking (without payment)</label>
@@ -105,31 +84,47 @@
                                 <input class="form-check-input" type="radio" name="payment-method" value="ADVANCE">
                                 <label>Pay Advance ({{room.AdvPrice}}/-)</label>
                             </div>
+                            <label>Check-in Date</label>
+                            <input type="date" class="form-control" name="checkin" id="checkinDate" required>
+
+                            <label>Check-out Date</label>
+                            <input type="date" class="form-control" name="checkout" id="checkoutDate" required>
+
+                            <div id="availabilityMessage" style="color: red; display: none;"></div>
+                             <button id="check" class="btn btn-dark mt-3 w-100">Check Availability</button>
 
                             <button id="smt" class="btn btn-dark mt-3 w-100" type="submit" disabled>Book Now</button>
+                        </div>
+                    </div>
+                </div>
             </form>
-            <button id="check" class="btn btn-dark mt-3 w-100">Check Availability</button>
+           
         </div>
     </div>
-</div>
-</div>
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <script>
 document.getElementById("check").addEventListener("click", async function (event) {
-    event.preventDefault();  // Prevents form submission on button click
-    const selectedDate = document.getElementById("dateInput").value;
+    event.preventDefault();
+    
+    const checkinDate = document.getElementById("checkinDate").value;
+    const checkoutDate = document.getElementById("checkoutDate").value;
     const roomId = "{{room._id}}";
 
-    if (!selectedDate) {
-        alert("Please select a date first.");
+    if (!checkinDate || !checkoutDate) {
+        alert("Please select both check-in and check-out dates.");
+        return;
+    }
+
+    if (new Date(checkoutDate) <= new Date(checkinDate)) {
+        alert("Check-out date must be after check-in date.");
         return;
     }
 
     try {
-        const response = await fetch(`/check-availability/?roomId=${roomId}&selecteddate=${selectedDate}`);
+        const response = await fetch(`/check-availability/?roomId=${roomId}&checkin=${checkinDate}&checkout=${checkoutDate}`);
         const data = await response.json();
         const availabilityMessage = document.getElementById("availabilityMessage");
         const bookButton = document.getElementById("smt");
@@ -193,7 +188,7 @@ document.getElementById("check").addEventListener("click", async function (event
             "name": "Ginberry",
             "description": "Test Transaction",
             "image": "https://example.com/your_logo",
-            "order_id": order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+            "order_id": order.id, //This is a sample Order ID. Pass the id obtained in the response of Step 1
             "handler": function (response) {
                 verifyPayment(response, order)
             },
@@ -246,7 +241,7 @@ document.getElementById("check").addEventListener("click", async function (event
     const dd = String(today.getDate()).padStart(2, '0');
 
     // Set the minimum date to today
-    dateInput.setAttribute('min', `${yyyy}-${mm}-${dd}`);
+    dateInput.setAttribute('min', ${yyyy}-${mm}-${dd});
 
     // Function to disable weekends
     dateInput.addEventListener('input', async function () {
@@ -256,7 +251,7 @@ document.getElementById("check").addEventListener("click", async function (event
         // Check if the selected date is Saturday (6) or Sunday (0)
 
         // Check if the date is already booked
-        const response = await fetch(`/check-date-booking`, {
+        const response = await fetch(/check-date-booking, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

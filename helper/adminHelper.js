@@ -390,6 +390,74 @@ module.exports = {
     });
   },
 
+  updateRoomPricingByCategory: (categoryId, newPrice, newAdvPrice) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let result = await db.get().collection(collections.ROOM_COLLECTION)
+                .updateMany(
+                    { category: new ObjectId(categoryId) }, // Match all rooms in the category
+                    { $set: { Price: newPrice, AdvPrice: newAdvPrice } } // Update Price & AdvPrice
+                );
+
+            resolve(result.modifiedCount); // Return how many rooms were updated
+        } catch (error) {
+            reject(error);
+        }
+    });
+},
+roomsPerCategory: () => {
+  return new Promise(async (resolve, reject) => {
+      try {
+          let rooms = await db.get().collection(collections.ROOM_COLLECTION)
+              .aggregate([
+                  {
+                      $lookup: {
+                          from: collections.CATEGORY_COLLECTION,
+                          localField: "category",
+                          foreignField: "_id",
+                          as: "categoryDetails"
+                      }
+                  },
+                  { $unwind: { path: "$categoryDetails", preserveNullAndEmptyArrays: true } },
+                  {
+                      $sort: { createdAt: -1 } // Optional: Sort by latest rooms first
+                  },
+                  {
+                      $group: {
+                          _id: "$category",
+                          room: { $first: "$$ROOT" }, // Pick the first room for each category
+                          categoryName: { $first: "$categoryDetails.name" }
+                      }
+                  },
+                  {
+                      $project: {
+                          _id: "$room._id",
+                          roomname: "$room.roomname",
+                          roomnumber: "$room.roomnumber",
+                          Price: "$room.Price",
+                          AdvPrice: "$room.AdvPrice",
+                          in: "$room.in",
+                          out: "$room.out",
+                          ren: "$room.ren",
+                          desc: "$room.desc",
+                          fesilities: "$room.fesilities",
+                          createdAt: "$room.createdAt",
+                          seat: "$room.seat",
+                          images: "$room.images",
+                          categoryId: "$_id",
+                          categoryName: { $ifNull: ["$categoryName", "Unknown"] }
+                      }
+                  }
+              ])
+              .toArray();
+
+          resolve(rooms);
+      } catch (error) {
+          reject(error);
+      }
+  });
+},
+
 
   getRoomsByCategory: (categoryId) => {
     return new Promise(async (resolve, reject) => {

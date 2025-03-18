@@ -49,6 +49,14 @@ app.engine(
         const year = date.getFullYear();
         return `${day}-${month}-${year}`; // Return the formatted date
       },
+      formatDateY: function (date) {
+        if (!date) return ''; // Handle null or undefined dates
+        const d = new Date(date);
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0'); // Ensure two digits
+        const day = String(d.getDate()).padStart(2, '0'); // Ensure two digits
+        return `${year}-${month}-${day}`;
+      },
       formatFacilities:  function (text) {
         if (!text) return ""; // Handle empty input
 

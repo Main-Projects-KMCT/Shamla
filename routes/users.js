@@ -74,14 +74,14 @@ router.post("/chatbot", async (req, res) => {
 router.get("/check-availability", async (req, res) => {
   try {
     console.log("!!!!!!!!!---checkkkkkkkkkkkkkk")
-      const { roomId, selecteddate } = req.query;
-      console.log("!!!!!!!!!checkkkkkkkkkkkkkkk",roomId, selecteddate)
+    const { roomId, checkin, checkout } = req.query;
+      console.log("!!!!!!!!!checkkkkkkkkkkkkkkk",roomId, checkin, checkout)
 
-      if (!roomId || !selecteddate) {
+      if (!roomId || !checkin) {
           return res.status(400).json({ error: "Missing roomId or selecteddate" });
       }
 
-      const isAvailable = await userHelper.checkRoomAvailability(roomId, selecteddate);
+      const isAvailable = await userHelper.checkRoomAvailability(roomId, checkin, checkout);
 
       if (isAvailable) {
           return res.json({ available: true, message: "available" });

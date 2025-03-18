@@ -330,6 +330,28 @@ router.get("/all-rooms", verifySignedIn, function (req, res) {
   });
 });
 
+
+router.get("/dynamic-pricing",verifySignedIn, async function (req, res) {
+  let administator = req.session.admin;
+
+   adminHelper.roomsPerCategory().then((rooms) => {
+    res.render("admin/dynamic-pricing", { admin: true, layout: "admin-layout", rooms,administator });
+  });
+})
+
+router.post('/update-room-pricing', async (req, res) => {
+  try {
+      let { categoryId, newPrice, newAdvPrice } = req.body;
+
+      let updatedCount = await adminHelper.updateRoomPricingByCategory(categoryId, parseFloat(newPrice), parseFloat(newAdvPrice));
+
+      res.json({ success: true, message: `${updatedCount} rooms updated successfully!` });
+  } catch (error) {
+      res.status(500).json({ success: false, message: "Failed to update room pricing", error });
+  }
+});
+
+
 router.get("/reports",verifySignedIn, function (req, res) {
   let administator = req.session.admin;
   // adminHelper.getAllrooms().then((rooms) => {

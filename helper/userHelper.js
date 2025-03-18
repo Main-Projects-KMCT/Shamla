@@ -397,18 +397,32 @@ module.exports = {
     });
   },
 
-  checkRoomAvailability:async (roomId,selecteddate)=>{
-    let ordersCollection= await  db.get().collection(collections.ORDER_COLLECTION)
-    const existingBooking = await ordersCollection.findOne({
-      "room._id": objectId(roomId),
-      "deliveryDetails.selecteddate": selecteddate
-  });
+  checkRoomAvailability: async (roomId, checkin, checkout) => {
+    let bookingsCollection = await db.get().collection(collections.ORDER_COLLECTION);
 
-  console.log("existingBooking===",existingBooking,"existingBooking=====")
+    // Ensure dates are in string format for comparison
+    const checkinDate = new Date(checkin);
+    const checkoutDate = new Date(checkout);
 
-  return !existingBooking; // Returns true if no matching order is found
+    console.log("chhh",checkinDate,checkoutDate)
 
-  },
+    // Check if there are any bookings for the given roomId that overlap with the selected dates
+    const overlappingBooking = await bookingsCollection.findOne({
+        "room._id": ObjectId(roomId),  // Ensure roomId is correctly matched
+        $or: [
+            { 
+                "deliveryDetails.checkin": { $lte: checkoutDate }, 
+                "deliveryDetails.checkout": { $gte: checkinDate } 
+            }, // Overlap check
+            { "deliveryDetails.checkin": checkin }, // Exact same check-in date
+            { "deliveryDetails.checkout": checkout } // Exact same check-out date
+        ]
+    });
+
+    console.log("existingBooking:", overlappingBooking);
+    return !overlappingBooking; // If overlappingBooking exists, return false (room is not available)
+},
+
 
 
 
@@ -448,7 +462,8 @@ module.exports = {
             District: order.District,
             State: order.State,
             Pincode: order.Pincode,
-            selecteddate: order.selecteddate,
+            checkin: new Date(order.checkin),  // Convert string to Date object
+            checkout: new Date(order.checkout),
             bedsheet: order.bedsheet,
             beds: order.beds,
             Note: order.Note,
