@@ -66,7 +66,8 @@
                         <div class="card shadow mb-2 p-4">
                             <h6>Room Details</h6>
                             <hr>
-                            <b>Room Name:</b> {{room.roomname}}<br>
+                            <b>Room Name:</b> {{room.name}}<br>
+                            <b>Room No:</b> {{room.roomnumber}}<br>
                             <b>Price per Night:</b> {{room.Price}}/-<br>
                         </div>
 
@@ -118,7 +119,7 @@ document.getElementById("check").addEventListener("click", async function (event
         return;
     }
 
-    if (new Date(checkoutDate) <= new Date(checkinDate)) {
+    if (new Date(checkoutDate) < new Date(checkinDate)) {
         alert("Check-out date must be after check-in date.");
         return;
     }

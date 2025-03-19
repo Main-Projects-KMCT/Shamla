@@ -22,9 +22,9 @@ const verifySignedIn = (req, res, next) => {
 /* GET admins listing. */
 router.get("/", verifySignedIn, function (req, res, next) {
   let administator = req.session.admin;
-  adminHelper.getAllProducts().then((products) => {
-    res.render("admin/home", { admin: true, products, layout: "admin-layout", administator });
-  });
+  // adminHelper.getAllProducts().then((products) => {
+    res.render("admin/home", { admin: true, layout: "admin-layout", administator });
+  // });
 });
 
 
