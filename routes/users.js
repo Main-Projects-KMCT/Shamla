@@ -654,5 +654,45 @@ router.get("/filter-rooms", async (req, res) => {
   }
 });
 
+router.get("/feedback/:id", verifySignedIn, async function (req, res, next) {
+  let user = req.session.user;
+  let id = req.params.id;
+  res.render("users/feedback", { admin: false, user,id, });
+});
+
+router.post("/feedback", verifySignedIn, async (req, res) => {
+  try {
+    const { Id, rating, username, feedback } = req.body;
+    const finalRating = rating ? parseInt(rating) : 0;
+ 
+    const userId = req.session.user._id;
+    const cmp= await userHelper.getorderDetails(Id);
+    const room= cmp.room.name;
+    const roomNumber=cmp.room.roomnumber;
+    
+    await db.get().collection(collections.FEEDBACK_COLLECTION)
+      .updateOne(
+        { orderId:Id, userId }, // filter: find a feedback for this complaint by this user
+        { $set: {
+          orderId:Id,
+           userId,
+            rating: finalRating,
+            feedback,   
+            room,
+            roomNumber,
+            updatedBy:username,
+            createdAt: new Date()
+          }
+        },
+        { upsert: true }
+      );
+    
+    res.redirect("/orders")
+  } catch (error) {
+    console.error("Error rating complaint", error);
+    res.status(500).json({ success: false, error: "Internal Server Error" });
+  }
+});
+
 
 module.exports = router;

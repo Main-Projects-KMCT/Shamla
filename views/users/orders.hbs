@@ -48,6 +48,11 @@
                             <a href="/updateorder/{{this._id}}" class="btn btn-dark btn-sm">
                                 Modify Booking
                             </a>
+                            {{#if (eq this.status "Confirmed")}}
+                            <a href="/feedback/{{this._id}}" class="btn btn-warning btn-sm">
+                             Feedback and Ratings
+                            </a>
+                            {{/if}}
                         </div>
                     </div>
                 </div>

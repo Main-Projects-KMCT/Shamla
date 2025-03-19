@@ -27,6 +27,12 @@ router.get("/", verifySignedIn, function (req, res, next) {
   // });
 });
 
+router.get("/feedback", verifySignedIn, async function (req, res) {
+  let administator = req.session.admin;
+  let feedbacks = await adminHelper.getAllFeedbacks();
+  res.render("admin/feedbacks", { admin: true, layout: "admin-layout", administator, feedbacks });
+});
+
 
 
 router.get("/all-notifications", verifySignedIn, async function (req, res) {

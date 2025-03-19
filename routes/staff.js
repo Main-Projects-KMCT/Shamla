@@ -372,5 +372,24 @@ router.post("/assign-room", function (req, res) {
   });
 });
 
+router.get("/feedback/:id", verifySignedIn, async function (req, res) {
+  
+  let staff = req.session.staff;
+  let staffId=staff._id;
+  console.log("feeddd",staff._id)
+  let assignedOrders = await db.get().collection(collections.ASSIGN_STAFF).find({
+    staff: new ObjectId(staffId)
+}).toArray();
+
+let orderIds = assignedOrders.map(order => order.order.toString());
+
+// Get feedbacks only for the assigned orders
+let feedbacks = await db.get().collection(collections.FEEDBACK_COLLECTION).find({
+    orderId: { $in: orderIds }
+}).toArray();
+  console.log("feedbacks************", feedbacks,"*****)")
+  res.render("admin/feedbacks", { admin: false, layout: "admin-layout", staff, feedbacks});
+});
+
 
 module.exports = router;

@@ -21,7 +21,47 @@ module.exports = {
     });
 
 
-  } ,                                     
+  } ,         
+  getStaffOrder:async (id)=>{
+    return new Promise((resolve, reject) => {
+       db.get().collection(collections.ASSIGN_STAFF).find(
+        { staff: ObjectId(id) }).toArray()
+        .then((response) => {
+          resolve(response);
+        });
+    });
+  } ,          
+  getAllFeedbacks: async (staffId) => {
+    console.log(staffId)
+    return  await db.get().collection(collections.FEEDBACK_COLLECTION).aggregate([
+      {
+          $lookup: {
+              from: collections.ASSIGN_STAFF,
+              localField: "orderId",
+              foreignField: "order",
+              as: "assignedStaff"
+          }
+      },
+      { $unwind: "$assignedStaff" },
+      {
+          $match: { "assignedStaff.staff": new ObjectId(staffId) }
+      },
+      {
+          $project: {
+              _id: 1,
+              orderId: 1,
+              userId: 1,
+              createdAt: 1,
+              feedback: 1,
+              rating: 1,
+              room: 1,
+              roomNumber: 1,
+              updatedBy: 1
+          }
+      }
+  ]).toArray();
+
+},                
   addnotification: (notification, callback) => {
     // Convert staffId and userId to ObjectId if they are provided in the notification
     if (notification.staffId) {
