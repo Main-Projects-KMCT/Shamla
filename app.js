@@ -67,7 +67,14 @@ app.engine(
             .join(""); // Join all items
     
         return `<ul class="facilities-list">${listItems}</ul>`; // Return as SafeString
-    }
+    },
+    halfAmount:function (fullAmount, paymentMethod) {
+      if (paymentMethod === "COD") {
+          return (fullAmount * 0.5).toFixed(2); // Ensures proper formatting
+      } else {
+          return fullAmount;
+      }
+  }
     },
   })
 );

@@ -214,6 +214,31 @@ router.get("/single-room/:id", async function (req, res) {
   }
 });
 
+router.get("/single-room/:id/:code", async function (req, res) {
+  let user = req.session.user;
+  const roomId = req.params.id;
+  const code= req.params.code;
+
+  try {
+    const room = await userHelper.getRoomById(roomId);
+
+    if (!room) {
+      return res.status(404).send("Room not found");
+    }
+    const feedbacks = await userHelper.getFeedbackByRoomId(roomId); // Fetch feedbacks for the specific room
+
+    res.render("users/single-room", {
+      admin: false,
+      user,
+      room,
+      feedbacks
+    });
+  } catch (error) {
+    console.error("Error fetching room:", error);
+    res.status(500).send("Server Error");
+  }
+});
+
 
 
 
