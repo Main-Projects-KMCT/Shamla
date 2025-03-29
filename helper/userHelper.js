@@ -314,7 +314,7 @@ console.log("dosi------------")
     });
   },
 
-  getRoomDetails: (roomId) => {
+  getRoomDetails: (roomId,currentSeason) => {
     return new Promise((resolve, reject) => {
       if (!ObjectId.isValid(roomId)) {
         reject(new Error('Invalid room ID format'));
@@ -329,6 +329,8 @@ console.log("dosi------------")
             reject(new Error('Room not found'));
           } else {
             // Assuming the room has a staffId field
+            room.Price = room[`${currentSeason}Price`] ?? room.normalPrice;
+            room.AdvPrice = room[`${currentSeason}AdvPrice`] ?? room.normalAdvPrice;
             resolve(room);
           }
         })

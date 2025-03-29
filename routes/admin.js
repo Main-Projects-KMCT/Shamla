@@ -347,15 +347,32 @@ router.get("/dynamic-pricing",verifySignedIn, async function (req, res) {
 
 router.post('/update-room-pricing', async (req, res) => {
   try {
-      let { categoryId, newPrice, newAdvPrice } = req.body;
+    let { categoryId, normalPrice, summerPrice, winterPrice, offseasonPrice } = req.body;
 
-      let updatedCount = await adminHelper.updateRoomPricingByCategory(categoryId, parseFloat(newPrice), parseFloat(newAdvPrice));
+    // Calculate advance prices (50% of the respective season price)
+    let normalAdvPrice = normalPrice / 2;
+    let summerAdvPrice = summerPrice / 2;
+    let winterAdvPrice = winterPrice / 2;
+    let offseasonAdvPrice = offseasonPrice / 2;
 
-      res.json({ success: true, message: `${updatedCount} rooms updated successfully!` });
+    // Update the database with new prices
+    let updatedCount = await adminHelper.updateRoomPricingByCategory(categoryId, {
+      normalPrice: parseFloat(normalPrice),
+      normalAdvPrice,
+      summerPrice: parseFloat(summerPrice),
+      summerAdvPrice,
+      winterPrice: parseFloat(winterPrice),
+      winterAdvPrice,
+      offseasonPrice: parseFloat(offseasonPrice),
+      offseasonAdvPrice
+    });
+
+    res.json({ success: true, message: `${updatedCount} rooms updated successfully!` });
   } catch (error) {
-      res.status(500).json({ success: false, message: "Failed to update room pricing", error });
+    res.status(500).json({ success: false, message: "Failed to update room pricing", error });
   }
 });
+
 
 
 router.get("/reports",verifySignedIn, function (req, res) {
@@ -364,6 +381,18 @@ router.get("/reports",verifySignedIn, function (req, res) {
     res.render("admin/reports", { admin: true, layout: "admin-layout", administator });
   // });
 })
+router.post("/update-season", async (req, res) => {
+  try {
+      const { season } = req.body;
+
+      await db.get().collection(collections.SETTINGS_COLLECTION)
+          .updateOne({}, { $set: { currentSeason: season } }, { upsert: true });
+
+      res.json({ success: true, message: "Season updated successfully!" });
+  } catch (error) {
+      res.status(500).json({ success: false, message: "Failed to update season", error });
+  }
+});
 
 router.get("/add-room", verifySignedIn, async function (req, res) {
   let administator = req.session.admin;

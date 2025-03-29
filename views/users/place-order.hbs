@@ -68,10 +68,19 @@
                             <hr>
                             <b>Room Name:</b> {{room.name}}<br>
                             <b>Room No:</b> {{room.roomnumber}}<br>
-                            <b>Price per Night:</b> {{room.Price}}/-<br>
+                            <b>Price per Night:</b> <span id="originalPrice" style="text-decoration: none;">{{room.Price}}/-</span> <br>
+                             <div id="discountSection" style="display: none;">
+            <b>Discounted Price per Night:</b> <span id="discountedPrice" style="color: green; font-weight: bold;"></span>/-<br>
+        </div>
                         </div>
 
                         <div class="card shadow p-4">
+                               <label>Discount Code</label>
+                            <div class="input-group mb-3">
+                                <input type="text" id="discountCode" class="form-control" placeholder="Enter Code">
+                                <input type="hidden" id="roomid" name="room" value="{{room._id}}">
+                                <button id="applyDiscount" class="btn btn-dark">Apply</button>
+                            </div>
                              <hr>
                             <div class="form-check mb-2">
                                 <input class="form-check-input" type="radio" name="payment-method" value="COD" checked>
@@ -91,8 +100,12 @@
                             <label>Check-out Date</label>
                             <input type="date" class="form-control" name="checkout" id="checkoutDate" required>
 
+                            
+                           
+                            <div id="discountMessage" style="color: red; display: none;"></div>
                             <div id="availabilityMessage" style="color: red; display: none;"></div>
                              <button id="check" class="btn btn-dark mt-3 w-100">Check Availability</button>
+
 
                             <button id="smt" class="btn btn-dark mt-3 w-100" type="submit" disabled>Book Now</button>
                         </div>
@@ -106,13 +119,113 @@
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
+   
+
 <script>
+    document.addEventListener("DOMContentLoaded", function () {
+    const checkinDate = document.getElementById("checkinDate");
+    const checkoutDate = document.getElementById("checkoutDate");
+
+
+
+    function setMinDates() {
+        const today = new Date().toISOString().split("T")[0]; // Format YYYY-MM-DD
+        checkinDate.setAttribute("min", today);
+        checkoutDate.setAttribute("min", today);
+    }
+
+    setMinDates(); // Set min dates on page load
+
+   
+});
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+     const discountInput = document.getElementById("discountCode");
+    const applyDiscountBtn = document.getElementById("applyDiscount");
+    const discountMessage = document.getElementById("discountMessage");
+
+    const originalPriceElement = document.getElementById("originalPrice");
+    const discountedPriceElement = document.getElementById("discountedPrice");
+
+        let originalPrice = parseFloat(originalPriceElement.innerText);
+           document.getElementById("applyDiscount").addEventListener("click", function (event) {
+        event.preventDefault(); // Prevents form submission
+        const code = discountInput.value.trim();
+        const room= "{{room._id}}";
+        if (!code) {
+            discountMessage.innerText = "Please enter a discount code!";
+            discountMessage.style.display = "block";
+            return;
+        }
+        try {
+            const response = await fetch("/check-discount-code", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ code ,room})
+            });
+
+           // const result = await response.json();
+           // if (result.success) {
+               // let discountPercentage = result.percentage;
+               // let discountedPrice = originalPrice - (originalPrice * discountPercentage / 100);
+               // let discountedAdvPrice = originalAdvPrice - (originalAdvPrice * discountPercentage / 100);
+
+              
+                //originalPriceElement.style.textDecoration = "line-through";
+               // originalAdvPriceElement.style.textDecoration = "line-through";
+
+                // Show discounted price
+               // discountedPriceElement.innerText = `${discountedPrice.toFixed(2)}/-`;
+               // discountedPriceElement.style.display = "inline";
+
+               // discountedAdvPriceElement.innerText = `${discountedAdvPrice.toFixed(2)}/-`;
+               // discountedAdvPriceElement.style.display = "inline";
+
+               // discountMessage.innerText = `Discount applied: ${discountPercentage}% off!`;
+               // discountMessage.style.color = "green";
+
+           // } else {
+              //  discountMessage.innerText = "Invalid or expired discount code.";
+              //  discountMessage.style.color = "red";
+
+                // Remove strike-through if invalid
+              //  originalPriceElement.style.textDecoration = "none";
+               // originalAdvPriceElement.style.textDecoration = "none";
+
+                // Hide discounted prices
+               // discountedPriceElement.style.display = "none";
+               // discountedAdvPriceElement.style.display = "none";
+           // }
+           // discountMessage.style.display = "block";
+       // } catch (error) {
+           // console.error("Error checking discount code:", error);
+       // }
+
+       
+        console.log("Discount button clicked, form not submitted.");
+    });
+
+    
+    })
+</script>
+
+
+<script>
+
 document.getElementById("check").addEventListener("click", async function (event) {
     event.preventDefault();
     
     const checkinDate = document.getElementById("checkinDate").value;
     const checkoutDate = document.getElementById("checkoutDate").value;
     const roomId = "{{room._id}}";
+  
+
+    // Ensure checkout date is always after check-in date
+    //checkinDate.addEventListener("change", function () {
+        //checkoutDate.min = checkinDate.value;
+   // }); --}}
 
     if (!checkinDate || !checkoutDate) {
         alert("Please select both check-in and check-out dates.");
@@ -232,39 +345,3 @@ document.getElementById("check").addEventListener("click", async function (event
 
 </script>
 
-<script>
-    const dateInput = document.getElementById('dateInput');
-
-    // Get today's date
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-    const dd = String(today.getDate()).padStart(2, '0');
-
-    // Set the minimum date to today
-    dateInput.setAttribute('min', ${yyyy}-${mm}-${dd});
-
-    // Function to disable weekends
-    dateInput.addEventListener('input', async function () {
-        const selectedDate = new Date(this.value);
-        const day = selectedDate.getUTCDay();
-
-        // Check if the selected date is Saturday (6) or Sunday (0)
-
-        // Check if the date is already booked
-        const response = await fetch(/check-date-booking, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ selecteddate: this.value }) // Send the selected date
-        });
-
-        const data = await response.json();
-        if (data.booked) {
-            alert("This date is already booked.");
-            this.value = ""; // Clear the input
-        }
-
-    });
-</script>

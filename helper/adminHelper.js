@@ -8,41 +8,48 @@ module.exports = {
 
 
 
-  getFilteredRooms: async (filters,priceRange) => {
-    console.log("priceRange:",priceRange,":priceRange")
+  getFilteredRooms: async (filters, priceRange, season) => {
+    console.log("priceRange:", priceRange, ":priceRange");
 
     try {
-      // ✅ Convert stored price values to numbers
-      if (priceRange) {
         return await db.get()
-        .collection(collections.ROOM_COLLECTION)
-        .aggregate([
-          {
-            $addFields: {
-              Price: { $toInt: "$Price" } // Convert string Price to integer
-            }
-          },
-          {
-            $match: filters
-          }
-        ])
-        .toArray();
-      }else{
-        return await db.get()
-        .collection(collections.ROOM_COLLECTION)
-        .aggregate([
-          {
-            $match: filters
-          }
-        ])
-        .toArray();
-      }
-      
+            .collection(collections.ROOM_COLLECTION)
+            .aggregate([
+                {
+                    $addFields: {
+                        Price: {
+                            $toInt: {
+                                $ifNull: [`$${season}Price`, "$normalPrice"]
+                            }
+                        },
+                        AdvPrice: {
+                            $toInt: {
+                                $ifNull: [`$${season}AdvPrice`, "$normalAdvPrice"]
+                            }
+                        }
+                    }
+                },
+                {
+                    $match: filters
+                },
+                ...(priceRange
+                    ? [
+                        {
+                            $match: {
+                                Price: { $gte: priceRange.min, $lte: priceRange.max }
+                            }
+                        }
+                    ]
+                    : []
+                )
+            ])
+            .toArray();
     } catch (error) {
-      console.error("Error fetching filtered rooms:", error);
-      return [];
+        console.error("Error fetching filtered rooms:", error);
+        return [];
     }
-  },
+},
+
 
 
 
@@ -404,21 +411,35 @@ module.exports = {
     });
   },
 
-  updateRoomPricingByCategory: (categoryId, newPrice, newAdvPrice) => {
+  updateRoomPricingByCategory: (categoryId, pricingData) => {
     return new Promise(async (resolve, reject) => {
         try {
             let result = await db.get().collection(collections.ROOM_COLLECTION)
                 .updateMany(
                     { category: new ObjectId(categoryId) }, // Match all rooms in the category
-                    { $set: { Price: newPrice, AdvPrice: newAdvPrice } } // Update Price & AdvPrice
+                    { 
+                        $set: { 
+                            Price: pricingData.normalPrice,
+                            AdvPrice: pricingData.normalAdvPrice,
+                            normalPrice: pricingData.normalPrice,
+                            normalAdvPrice: pricingData.normalAdvPrice,
+                            summerPrice: pricingData.summerPrice,
+                            summerAdvPrice: pricingData.summerAdvPrice,
+                            winterPrice: pricingData.winterPrice,
+                            winterAdvPrice: pricingData.winterAdvPrice,
+                            offseasonPrice: pricingData.offseasonPrice,
+                            offseasonAdvPrice: pricingData.offseasonAdvPrice
+                        } 
+                    }
                 );
 
-            resolve(result.modifiedCount); // Return how many rooms were updated
+            resolve(result.modifiedCount); // Return the number of rooms updated
         } catch (error) {
             reject(error);
         }
     });
 },
+
 roomsPerCategory: () => {
   return new Promise(async (resolve, reject) => {
       try {
@@ -473,55 +494,56 @@ roomsPerCategory: () => {
 },
 
 
-  getRoomsByCategory: (categoryId) => {
-    return new Promise(async (resolve, reject) => {
+getRoomsByCategory: (categoryId, currentSeason) => {
+  return new Promise(async (resolve, reject) => {
       try {
-        let rooms = await db.get().collection(collections.ROOM_COLLECTION)
-          .aggregate([
-            {
-              $match: { category: new ObjectId(categoryId) } // Filter rooms by category ID
-            },
-            {
-              $lookup: {
-                from: collections.CATEGORY_COLLECTION,
-                localField: "category",
-                foreignField: "_id",
-                as: "categoryDetails"
-              }
-            },
-            {
-              $unwind: {
-                path: "$categoryDetails",
-                preserveNullAndEmptyArrays: true
-              }
-            },
-            {
-              $project: {
-                _id: 1,
-                roomname: 1,
-                Price: 1,
-                AdvPrice: 1,
-                in: 1,
-                out: 1,
-                ren: 1,
-                desc: 1,
-                fesilities: 1,
-                createdAt: 1,
-                seat: 1,
-                images: 1,
-                categoryId: "$category",
-                categoryName: { $ifNull: ["$categoryDetails.name", "Unknown"] }
-              }
-            }
-          ])
-          .toArray();
+          let rooms = await db.get().collection(collections.ROOM_COLLECTION)
+              .aggregate([
+                  {
+                      $match: { category: new ObjectId(categoryId) } // Filter rooms by category ID
+                  },
+                  {
+                      $lookup: {
+                          from: collections.CATEGORY_COLLECTION,
+                          localField: "category",
+                          foreignField: "_id",
+                          as: "categoryDetails"
+                      }
+                  },
+                  {
+                      $unwind: {
+                          path: "$categoryDetails",
+                          preserveNullAndEmptyArrays: true
+                      }
+                  },
+                  {
+                      $project: {
+                          _id: 1,
+                          roomname: 1,
+                          Price: { $ifNull: [`$${currentSeason}Price`, "$normalPrice"] }, // Use season price or fallback to normalPrice
+                          AdvPrice: { $ifNull: [`$${currentSeason}AdvPrice`, "$normalAdvPrice"] }, // Use season advPrice or fallback
+                          in: 1,
+                          out: 1,
+                          ren: 1,
+                          desc: 1,
+                          fesilities: 1,
+                          createdAt: 1,
+                          seat: 1,
+                          images: 1,
+                          categoryId: "$category",
+                          categoryName: { $ifNull: ["$categoryDetails.name", "Unknown"] }
+                      }
+                  }
+              ])
+              .toArray();
 
-        resolve(rooms);
+          resolve(rooms);
       } catch (error) {
-        reject(error);
+          reject(error);
       }
-    });
-  },
+  });
+},
+
 
   ///////ADD room DETAILS/////////////////////                                            
   getroomDetails: (roomId) => {

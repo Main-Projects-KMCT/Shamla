@@ -10,5 +10,6 @@ module.exports = {
     CATEGORY_COLLECTION: "category",
     ASSIGNED_ROOMS: "assigned-rooms",
     ASSIGN_STAFF: "assigned-staffs",
-    DISCOUNTS_COLLECTION: "discounts"
+    DISCOUNTS_COLLECTION: "discounts",
+    SETTINGS_COLLECTION: "settings",
 }

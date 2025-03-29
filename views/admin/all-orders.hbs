@@ -77,7 +77,7 @@
                                         <th>User Details</th>
                                         <th>Payment</th>
                                         <th>Addons</th>
-                                        <th>Selected Date</th>
+                                        <th>Booked Date</th>
                                         <th>Status</th>
 
                                         <th>Manage</th>
@@ -116,7 +116,9 @@
 
 
 
-                                        <td>{{deliveryDetails.selecteddate}}</td>
+                                        <td>In:{{formatDate deliveryDetails.checkin}} <br>
+                                         Out:{{formatDate deliveryDetails.checkout}}
+                                        </td>
 
 
 
@@ -153,8 +155,7 @@
                                         </td>
                                         <td class="d-flex gap-2"><a href="/staff/cancel-booking/{{this._id}}"
                                                 onclick="return confirm('Are You Sure to Vacate This Booking ?')"
-                                                class="btn btn-danger">Vacate</a>
-
+                                                class="btn btn-danger">Vacate</a> 
                                             <a href="/staff/cancel-booking/{{this._id}}"
                                                 onclick="return confirm('Are You Sure to Cancel This Booking ?')"
                                                 class="btn btn-danger"><i class="bi bi-trash"></i></a>

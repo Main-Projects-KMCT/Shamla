@@ -118,7 +118,10 @@ router.get("/rooms/:id", async (req, res) => {
   let user = req.session.user;
   try {
     let categoryId = req.params.id; // Get category ID from URL
-    let rooms = await adminHelper.getRoomsByCategory(categoryId); // Fetch rooms
+    const settings = await db.get().collection(collections.SETTINGS_COLLECTION).findOne({});
+    const currentSeason = settings?.currentSeason || "normal"; // Default to "normal" if not set
+
+    let rooms = await adminHelper.getRoomsByCategory(categoryId,currentSeason); // Fetch rooms
 
     res.render("users/rooms", { admin: false, rooms, user }); // Render the rooms page
   } catch (error) {
@@ -492,6 +495,8 @@ router.post("/edit-profile/:id", verifySignedIn, async function (req, res) {
 
 router.get('/place-order/:id', verifySignedIn, async (req, res) => {
   const roomId = req.params.id;
+  const settings = await db.get().collection(collections.SETTINGS_COLLECTION).findOne({});
+  const currentSeason = settings?.currentSeason || "normal";
 
   // Validate the room ID
   if (!ObjectId.isValid(roomId)) {
@@ -501,7 +506,7 @@ router.get('/place-order/:id', verifySignedIn, async (req, res) => {
   let user = req.session.user;
 
   // Fetch the product details by ID
-  let room = await userHelper.getRoomDetails(roomId);
+  let room = await userHelper.getRoomDetails(roomId,currentSeason);
 
   // If no room is found, handle the error
   if (!room) {
@@ -515,9 +520,11 @@ router.get('/place-order/:id', verifySignedIn, async (req, res) => {
 router.post('/place-order', async (req, res) => {
   let user = req.session.user;
   let roomId = req.body.roomId;
+  const settings = await db.get().collection(collections.SETTINGS_COLLECTION).findOne({});
+  const currentSeason = settings?.currentSeason || "normal"; 
 
   // Fetch room details
-  let room = await userHelper.getRoomDetails(roomId);
+  let room = await userHelper.getRoomDetails(roomId,currentSeason);
   if (!room) {
     return res.status(404).send("Room not found");
   }
@@ -573,6 +580,29 @@ router.get("/order-placed", verifySignedIn, async (req, res) => {
   // le = await userHelper.g(userId);
   res.render("users/order-placed", { admin: false, user });
 });
+
+router.post("/check-discount-code", async (req, res) => {
+  try {
+      const { code,room         } = req.body;
+      if (!code) {
+          return res.json({ success: false, message: "Code is required" });
+      }
+
+      const discount = await db.get()
+          .collection(collections.DISCOUNTS_COLLECTION)
+          .findOne({ code: code,room:ObjectId(room) });
+
+      if (!discount) {
+          return res.json({ success: false, message: "Invalid or expired discount code" });
+      }
+
+      return res.json({ success: true, percentage: discount.percentage });
+  } catch (error) {
+      console.error("Error checking discount code:", error);
+      res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
 
 router.get("/orders", verifySignedIn, async function (req, res) {
   let user = req.session.user;
@@ -641,6 +671,8 @@ router.post("/updateorder/:id", verifySignedIn, function (req, res) {
 
 router.get("/filter-rooms", async (req, res) => {
   let user = req.session.user;
+  const settings = await db.get().collection(collections.SETTINGS_COLLECTION).findOne({});
+  const currentSeason = settings?.currentSeason || "normal"; 
 
   console.log(req.query,"--req.query,body---", req.body); // Debugging
 
@@ -664,7 +696,7 @@ router.get("/filter-rooms", async (req, res) => {
 
     // Fetch rooms and categories
     let categories = await adminHelper.getAllCategories();
-    let rooms = await adminHelper.getFilteredRooms(filters,priceRange);
+    let rooms = await adminHelper.getFilteredRooms(filters,priceRange,currentSeason);
 
     res.render("users/filter-rooms", {
       admin: false,
