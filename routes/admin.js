@@ -339,9 +339,11 @@ router.get("/all-rooms", verifySignedIn, function (req, res) {
 
 router.get("/dynamic-pricing",verifySignedIn, async function (req, res) {
   let administator = req.session.admin;
+  const settings = await db.get().collection(collections.SETTINGS_COLLECTION).findOne({});
+  const currentSeason = settings?.currentSeason || "normal";
 
    adminHelper.roomsPerCategory().then((rooms) => {
-    res.render("admin/dynamic-pricing", { admin: true, layout: "admin-layout", rooms,administator });
+    res.render("admin/dynamic-pricing", { admin: true, layout: "admin-layout", rooms,administator, settings ,currentSeason});
   });
 })
 
@@ -739,7 +741,7 @@ router.get("/all-discounts", verifySignedIn, function (req, res) {
 
 router.get("/add-discount", verifySignedIn, async function (req, res) {
   let administator = req.session.admin;
-  let rooms = await adminHelper.getAllROOOMs()
+  let rooms = await adminHelper.getAllCategories()
   res.render("admin/discount/add-discount", { admin: true, layout: "admin-layout", administator, rooms });
 });
 

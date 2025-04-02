@@ -1039,7 +1039,7 @@ getRoomsByCategory: (categoryId, currentSeason) => {
     console.log(discount);
     discount.createdAt = new Date();
     if (discount.room) {
-      discount.room = new objectId(discount.room);
+      discount.room = discount.room;
     }
 
 
