@@ -79,8 +79,11 @@
                             <div class="input-group mb-3">
                                 <input type="text" id="discountCode" class="form-control" placeholder="Enter Code">
                                 <input type="hidden" id="roomid" name="room" value="{{room._id}}">
+                                 
                                 <button id="applyDiscount" class="btn btn-dark">Apply</button>
+                               
                             </div>
+                             <div id="discountMessage" style="color: red; display: none;"></div>
                              <hr>
                             <div class="form-check mb-2">
                                 <input class="form-check-input" type="radio" name="payment-method" value="COD" checked>
@@ -102,7 +105,7 @@
 
                             
                            
-                            <div id="discountMessage" style="color: red; display: none;"></div>
+                           
                             <div id="availabilityMessage" style="color: red; display: none;"></div>
                              <button id="check" class="btn btn-dark mt-3 w-100">Check Availability</button>
 
@@ -141,76 +144,106 @@
 </script>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-     const discountInput = document.getElementById("discountCode");
+      document.addEventListener("DOMContentLoaded", function () {
+        let discountApplied = false;
+    let discountPercentage = 0;
+        const discountInput = document.getElementById("discountCode");
     const applyDiscountBtn = document.getElementById("applyDiscount");
     const discountMessage = document.getElementById("discountMessage");
-
     const originalPriceElement = document.getElementById("originalPrice");
     const discountedPriceElement = document.getElementById("discountedPrice");
-
-        let originalPrice = parseFloat(originalPriceElement.innerText);
-           document.getElementById("applyDiscount").addEventListener("click", function (event) {
+    const discountSection = document.getElementById("discountSection");
+    let originalPrice = parseFloat(originalPriceElement.innerText);
+           document.getElementById("applyDiscount").addEventListener("click",async function (event) {
         event.preventDefault(); // Prevents form submission
-        const code = discountInput.value.trim();
-        const room= "{{room._id}}";
-        if (!code) {
-            discountMessage.innerText = "Please enter a discount code!";
-            discountMessage.style.display = "block";
-            return;
-        }
-        try {
+          const discountCode = document.getElementById("discountCode").value.trim();
+        const roomId = "{{room._id}}";
+
+         if (!discountCode) {
+        discountMessage.textContent = "Please enter a discount code.";
+        discountMessage.style.display = "block";
+        return;
+    }
+    
+    try {
+            console.log("Sending request:", JSON.stringify({ code: discountCode, room: roomId }));
+
             const response = await fetch("/check-discount-code", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ code ,room})
+                body: JSON.stringify({ code: discountCode, room: roomId })
             });
 
-           // const result = await response.json();
-           // if (result.success) {
-               // let discountPercentage = result.percentage;
-               // let discountedPrice = originalPrice - (originalPrice * discountPercentage / 100);
-               // let discountedAdvPrice = originalAdvPrice - (originalAdvPrice * discountPercentage / 100);
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
 
-              
-                //originalPriceElement.style.textDecoration = "line-through";
-               // originalAdvPriceElement.style.textDecoration = "line-through";
+            const data = await response.json();
+            console.log("Response data:", data);
 
-                // Show discounted price
-               // discountedPriceElement.innerText = `${discountedPrice.toFixed(2)}/-`;
-               // discountedPriceElement.style.display = "inline";
+           if (data.success) {
+    const discountAmount = (originalPrice * data.percentage) / 100;
+    const newPrice = originalPrice - discountAmount;
 
-               // discountedAdvPriceElement.innerText = `${discountedAdvPrice.toFixed(2)}/-`;
-               // discountedAdvPriceElement.style.display = "inline";
 
-               // discountMessage.innerText = `Discount applied: ${discountPercentage}% off!`;
-               // discountMessage.style.color = "green";
+                discountSection.style.display = "block";
+    discountedPriceElement.innerText = newPrice.toFixed(2);
+    discountMessage.textContent = "Discount applied successfully!";
+    discountMessage.style.color = "green";
+    discountApplied = true;
+} else {
+    discountMessage.textContent = data.message || "Invalid discount code.";
+    discountMessage.style.color = "red";
+    discountApplied = false;
+}
+            
+            discountMessage.style.display = "block";
 
-           // } else {
-              //  discountMessage.innerText = "Invalid or expired discount code.";
-              //  discountMessage.style.color = "red";
+        } catch (error) {
+            console.error("Error checking discount code:", error);
+            discountMessage.textContent = "Something went wrong. Please try again.";
+            discountMessage.style.display = "block";
+        }
+           })
 
-                // Remove strike-through if invalid
-              //  originalPriceElement.style.textDecoration = "none";
-               // originalAdvPriceElement.style.textDecoration = "none";
+           $("#checkout-form").submit((e) => {
+        e.preventDefault();
+          const advancePrice = "{{ room.AdvPrice }}";
 
-                // Hide discounted prices
-               // discountedPriceElement.style.display = "none";
-               // discountedAdvPriceElement.style.display = "none";
-           // }
-           // discountMessage.style.display = "block";
-       // } catch (error) {
-           // console.error("Error checking discount code:", error);
-       // }
+        let selectedPaymentMethod = $("input[name='payment-method']:checked").val();
+        let totalAmount = originalPrice;
+        let advanceAmount = advancePrice;
 
-       
-        console.log("Discount button clicked, form not submitted.");
+        if (discountApplied) {
+            totalAmount = originalPrice * (1 - discountPercentage / 100);
+            advanceAmount = totalAmount / 2; // Assuming advance is half of the discounted total
+        }
+
+        let paymentAmount = selectedPaymentMethod === "ADVANCE" ? advanceAmount : totalAmount;
+
+        $.ajax({
+            url: '/place-order',
+            method: 'post',
+            data: $("#checkout-form").serialize(),
+            success: (response) => {
+                if (response.codSuccess) {
+                    location.href = '/order-placed';
+                } else {
+                    // Pass the correct amount to Razorpay
+                    razorpayPayment(response, paymentAmount);
+                }
+            },
+            error: (xhr, status, error) => {
+                console.error("Error placing order:", xhr.responseText);
+                alert("An error occurred while placing the order. Please try again.");
+            }
+        });
     });
 
+      });
+      
     
-    })
 </script>
-
 
 <script>
 
@@ -220,6 +253,8 @@ document.getElementById("check").addEventListener("click", async function (event
     const checkinDate = document.getElementById("checkinDate").value;
     const checkoutDate = document.getElementById("checkoutDate").value;
     const roomId = "{{room._id}}";
+  
+   
   
 
     // Ensure checkout date is always after check-in date
@@ -259,39 +294,11 @@ document.getElementById("check").addEventListener("click", async function (event
         alert("Something went wrong! Please try again.");
     }
 });
+
 </script>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 
-<script>
-    $("#checkout-form").submit((e) => {
-        e.preventDefault();
-
-        let selectedPaymentMethod = $("input[name='payment-method']:checked").val();
-        let advanceAmount = {{ room.AdvPrice }}; // Ensure correct Handlebars syntax
-    let totalAmount = {{ room.Price }};
-
-    let paymentAmount = selectedPaymentMethod === "ADVANCE" ? advanceAmount : totalAmount;
-
-    $.ajax({
-        url: '/place-order',
-        method: 'post',
-        data: $("#checkout-form").serialize(),
-        success: (response) => {
-            if (response.codSuccess) {
-                location.href = '/order-placed';
-            } else {
-                // Pass the correct amount to Razorpay
-                razorpayPayment(response, paymentAmount);
-            }
-        },
-        error: (xhr, status, error) => {
-            console.error("Error placing order:", xhr.responseText);
-            alert("An error occurred while placing the order. Please try again.");
-        }
-    });
-    });
-</script>
 
 <script>
     function razorpayPayment(order) {

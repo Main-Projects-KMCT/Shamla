@@ -583,10 +583,8 @@ router.get("/order-placed", verifySignedIn, async (req, res) => {
 
 router.post("/check-discount-code", async (req, res) => {
   try {
-      const { code,room         } = req.body;
-      if (!code) {
-          return res.json({ success: false, message: "Code is required" });
-      }
+      const { code,room } = req.body;
+      console.log("disssssssssss",code)
 
       const discount = await db.get()
           .collection(collections.DISCOUNTS_COLLECTION)
