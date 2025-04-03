@@ -95,7 +95,7 @@
                             </div>
                             <div class="form-check mb-2">
                                 <input class="form-check-input" type="radio" name="payment-method" value="ADVANCE">
-                                <label>Pay Advance ({{room.AdvPrice}}/-)</label>
+                                <label>Pay Advance ({{room.AdvPrice}}/-) <span id="discountedPrice2" style="color: green; font-weight: bold;"></span></label>
                             </div>
                             <label>Check-in Date</label>
                             <input type="date" class="form-control" name="checkin" id="checkinDate" required>
@@ -152,6 +152,7 @@
     const discountMessage = document.getElementById("discountMessage");
     const originalPriceElement = document.getElementById("originalPrice");
     const discountedPriceElement = document.getElementById("discountedPrice");
+    const discountedPrice2=document.getElementById('discountedPrice');
     const discountSection = document.getElementById("discountSection");
     let originalPrice = parseFloat(originalPriceElement.innerText);
            document.getElementById("applyDiscount").addEventListener("click",async function (event) {
@@ -188,6 +189,7 @@
 
                 discountSection.style.display = "block";
     discountedPriceElement.innerText = newPrice.toFixed(2);
+     discountedPrice2.innerText = newPrice.toFixed(2);
     discountMessage.textContent = "Discount applied successfully!";
     discountMessage.style.color = "green";
     discountApplied = true;
