@@ -758,15 +758,16 @@ router.post("/add-discount", function (req, res) {
   });
 });
 
-router.get("/edit-discounts/:id", verifySignedIn, async function (req, res) {
+router.get("/discount/edit-discount/:id", verifySignedIn, async function (req, res) {
   let administator = req.session.admin;
   let discountsId = req.params.id;
-  let discounts = await adminHelper.getDiscountDetails(discountsId);
-  console.log(discounts);
-  res.render("admin/discount/edit-discount", { admin: true, discounts, layout: "admin-layout", administator });
+  let discount = await adminHelper.getDiscountDetails(discountsId);
+  let rooms = await adminHelper.getAllCategories()
+
+  res.render("admin/discount/edit-discount", { admin: true, discount, rooms, layout: "admin-layout", administator });
 });
 
-router.post("/edit-discount/:id", verifySignedIn, function (req, res) {
+router.post("/discount/edit-discount/:id", verifySignedIn, function (req, res) {
   let discountsId = req.params.id;
   adminHelper.updateDiscounts(discountsId, req.body).then(() => {
     if (req.files) {

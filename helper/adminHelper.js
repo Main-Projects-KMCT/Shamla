@@ -674,7 +674,16 @@ getRoomsByCategory: (categoryId, currentSeason) => {
       }
     });
   },
-
+  getDiscountDetails:(categoryId) => {
+    return new Promise((resolve, reject) => {
+      db.get()
+        .collection(collections.DISCOUNTS_COLLECTION)
+        .findOne({ _id: objectId(categoryId) })
+        .then((response) => {
+          resolve(response);
+        });
+    });
+  },
  
 
 
@@ -744,7 +753,28 @@ getRoomsByCategory: (categoryId, currentSeason) => {
       }
     });
   },
-
+  updateDiscounts:(categoryId, Details) => {
+    return new Promise((resolve, reject) => {
+      db.get()
+        .collection(collections.CATEGORY_COLLECTION)
+        .updateOne(
+          { _id: objectId(categoryId) },
+          {
+            $set: {
+                name:Details.name,
+                subname:Details.subname,
+                code:Details.code,
+                percentage:parseFloat(Details.percentage),
+                desc:Details.desc,
+                offerVisibility:Details.offerVisibility
+            }
+          }
+        )
+        .then((response) => {
+          resolve();
+        });
+    });
+  },
 
 
   updateCategory: (categoryId, categoryDetails) => {

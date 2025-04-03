@@ -1,3 +1,57 @@
+<style>
+   
+.coupon-wrapper {
+  height: auto;
+  background-color: #f7f7f7;
+  align-items: center;
+  width: 35%;
+  display: flex;
+  border-radius: 30px;
+  font-size: 1.5em;
+}
+
+.coupon-input {
+  border: 0;
+  margin-right: -20px;
+  background-color: #f7f7f7;
+  border-radius: 25px;
+  max-width: 150px;
+  text-align: center;
+  font-weight: bold;
+  outline: none;
+  &::selection {
+    background: none;
+  }
+  &::-moz-selection {
+    background: none;
+  }
+  &::-webkit-selection {
+    background: none;
+  }
+}
+
+.coupon-button {
+  border: 0;
+  color: #fff;
+  display: inline-block;
+  position: relative;
+  font-size: 0.9em;
+  -webkit-transition: all 300ms ease;
+  transition: all 300ms ease;
+  background-color: #741fa2;
+  border-radius: 25px;
+  padding: 15px 25px;
+  margin: 6px;
+  font-size: 0.6em;
+  outline: none;
+  &:hover {
+    background-color: darken(#741fa2, 10%);
+  }
+  
+}
+
+</style>
+
 <main class="main">
 
 
@@ -18,7 +72,7 @@
                     <img src="/images/category-images/{{this._id}}.png" class="img-fluid about-img" alt="">
                 </div> --}}
                 <div class="col-lg-6 content mb-4">
-                    <img src="/images/discounts-images/{{this._id}}.png" class="img-fluid about-img" alt="">
+                    <img src="/images/discounts-images/{{this._id}}.png" class="img-fluid about-img" alt="" style="height:600px">
                     <br><br>
                     <h3>{{this.name}}</h3>
 
@@ -27,9 +81,16 @@
                     </p>
                     <p>
                         Use this code to get discount when checkout
-                        <a href="#!" class="btn btn-success">{{this.code}}</a>
-
+                        
                     </p>
+                    <section class="content">
+    <div class="coupon-wrapper">
+      <input class="coupon-input" readonly="true" id='select-coupon' value="{{this.code}}" />
+      <button class="coupon-button" id="clickCoupon">
+        Copy
+      </button>
+    </div>
+  </section>
 
                     <a href="/single-room/{{this.room}}" class="btn btn-dark btn-sm">Learn More + </a>
                 </div>
@@ -90,3 +151,24 @@
             </div>
         </div>
     </div>
+
+    <script>
+        let couponButton = document.getElementById("clickCoupon");
+const couponTextActive = "Copied!";
+const couponText = "Copy";
+
+couponButton.addEventListener("click", function (e) {
+  e.preventDefault();
+  document.execCommand(
+    "copy",
+    false,
+    document.getElementById("select-coupon").select()
+  );
+  couponButton.innerHTML = couponTextActive;
+
+  setTimeout(function () {
+    couponButton.innerHTML = couponText;
+  }, 3500);
+});
+
+    </script>
