@@ -64,7 +64,8 @@ module.exports = {
           { _id: objectId(orderId) },
           {
             $set: {
-              "deliveryDetails.selecteddate": orderDetails.selecteddate,
+              "deliveryDetails.checkin": orderDetails.checkin,
+              "deliveryDetails.checkout": orderDetails.checkout,
               "deliveryDetails.bedsheet": orderDetails.bedsheet,
               "deliveryDetails.beds": orderDetails.beds,
               "deliveryDetails.Note": orderDetails.Note,
@@ -173,6 +174,19 @@ module.exports = {
         const room = await db.get()
           .collection(collections.ROOM_COLLECTION)
           .findOne({ _id: ObjectId(roomId) }); // Convert roomId to ObjectId
+        resolve(room);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
+  getRoomByName: (roomId) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const room = await db.get()
+          .collection(collections.ROOM_COLLECTION)
+          .findOne({ name: roomId }); // Convert roomId to ObjectId
         resolve(room);
       } catch (error) {
         reject(error);

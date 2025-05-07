@@ -66,37 +66,31 @@
         </div> <br><br><br>
         <div class="container aos-init aos-animate" data-aos="fade-up" data-aos-delay="100">
 
-            <div class="row gy-4">
-                {{#each offers}}
-                {{!-- <div class="col-lg-6 order-2 order-lg-2">
-                    <img src="/images/category-images/{{this._id}}.png" class="img-fluid about-img" alt="">
-                </div> --}}
-                <div class="col-lg-6 content mb-4">
-                    <img src="/images/discounts-images/{{this._id}}.png" class="img-fluid about-img" alt="" style="height:600px">
-                    <br><br>
-                    <h3>{{this.name}}</h3>
+           <div class="row gy-4">
+    {{#each offers}}
+    <div class="col-lg-6 content mb-4">
+        <img src="/images/discounts-images/{{this._id}}.png" class="img-fluid about-img" alt="" style="height:600px">
+        <br><br>
+        <h3>{{this.name}}</h3>
 
-                    <p>
-                        {{this.desc}}
-                    </p>
-                    <p>
-                        Use this code to get discount when checkout
-                        
-                    </p>
-                    <section class="content">
-    <div class="coupon-wrapper">
-      <input class="coupon-input" readonly="true" id='select-coupon' value="{{this.code}}" />
-      <button class="coupon-button" id="clickCoupon">
-        Copy
-      </button>
-    </div>
-  </section>
+        <p>{{this.desc}}</p>
+        
+        <p>Use this code to get discount when checkout <h6>{{this.subname}}</h6></p>
 
-                    <a href="/single-room/{{this.room}}" class="btn btn-dark btn-sm">Learn More + </a>
-                </div>
-
-                {{/each}}
+        <section class="content">
+            <div class="coupon-wrapper">
+                <input class="coupon-input" readonly value="{{this.code}}" />
+                <button class="coupon-button btn btn-outline-dark btn-sm">
+                    Copy
+                </button>
             </div>
+        </section>
+
+        <a href="/single-room-offer/{{this.subname}}" class="btn btn-dark btn-sm">Learn More +</a>
+    </div>
+    {{/each}}
+</div>
+
 
         </div>
 
@@ -152,23 +146,18 @@
         </div>
     </div>
 
-    <script>
-        let couponButton = document.getElementById("clickCoupon");
-const couponTextActive = "Copied!";
-const couponText = "Copy";
-
-couponButton.addEventListener("click", function (e) {
-  e.preventDefault();
-  document.execCommand(
-    "copy",
-    false,
-    document.getElementById("select-coupon").select()
-  );
-  couponButton.innerHTML = couponTextActive;
-
-  setTimeout(function () {
-    couponButton.innerHTML = couponText;
-  }, 3500);
-});
-
-    </script>
+<script>
+  document.querySelectorAll(".coupon-button").forEach((button) => {
+    button.addEventListener("click", function () {
+      const input = this.previousElementSibling;
+      input.select();
+      input.setSelectionRange(0, 99999); // For mobile compatibility
+      navigator.clipboard.writeText(input.value).then(() => {
+        this.textContent = "Copied!";
+        setTimeout(() => {
+          this.textContent = "Copy";
+        }, 3000);
+      });
+    });
+  });
+</script>

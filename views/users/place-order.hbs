@@ -158,7 +158,7 @@
            document.getElementById("applyDiscount").addEventListener("click",async function (event) {
         event.preventDefault(); // Prevents form submission
           const discountCode = document.getElementById("discountCode").value.trim();
-        const roomId = "{{room._id}}";
+        const roomId = "{{room.name}}";
 
          if (!discountCode) {
         discountMessage.textContent = "Please enter a discount code.";

@@ -217,6 +217,30 @@ router.get("/single-room/:id", async function (req, res) {
   }
 });
 
+router.get("/single-room-offer/:sub", async function (req, res) {
+  let user = req.session.user;
+  const name = req.params.sub;
+
+  try {
+    const room = await userHelper.getRoomByName(name);
+
+    if (!room) {
+      return res.status(404).send("Room not found");
+    }
+    const feedbacks = await userHelper.getFeedbackByRoomId(room._id); // Fetch feedbacks for the specific room
+
+    res.render("users/single-room", {
+      admin: false,
+      user,
+      room,
+      feedbacks
+    });
+  } catch (error) {
+    console.error("Error fetching room:", error);
+    res.status(500).send("Server Error");
+  }
+});
+
 router.get("/single-room/:id/:code", async function (req, res) {
   let user = req.session.user;
   const roomId = req.params.id;
@@ -584,11 +608,11 @@ router.get("/order-placed", verifySignedIn, async (req, res) => {
 router.post("/check-discount-code", async (req, res) => {
   try {
       const { code,room } = req.body;
-      console.log("disssssssssss",code)
+      console.log("disssssssssss",code,room)
 
       const discount = await db.get()
           .collection(collections.DISCOUNTS_COLLECTION)
-          .findOne({ code: code,room:ObjectId(room) });
+          .findOne({ code: code,subname:room });
 
       if (!discount) {
           return res.json({ success: false, message: "Invalid or expired discount code" });
@@ -655,7 +679,7 @@ router.get("/updateorder/:id", verifySignedIn, async function (req, res) {
 
 router.post("/updateorder/:id", verifySignedIn, function (req, res) {
   let orderId = req.params.id;
-
+ console.log("edittttttt",orderId, req.body)
   // Update order details
   userHelper.updateorder(orderId, req.body).then(() => {
     res.redirect("/orders");
