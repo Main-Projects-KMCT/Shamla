@@ -756,7 +756,7 @@ getRoomsByCategory: (categoryId, currentSeason) => {
   updateDiscounts:(categoryId, Details) => {
     return new Promise((resolve, reject) => {
       db.get()
-        .collection(collections.CATEGORY_COLLECTION)
+        .collection(collections.DISCOUNTS_COLLECTION)
         .updateOne(
           { _id: objectId(categoryId) },
           {

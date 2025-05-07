@@ -91,9 +91,12 @@
             const seatsAvailable = parseInt(button.getAttribute('data-seats'), 10);
 
             if (seatsAvailable === 0) {
-                button.disabled = true; // Disable the button if sold out
-                button.textContent = 'Sold Out'; // Change the button text
-                button.classList.add('disabled'); // Optionally add a disabled class for styling
+               // button.disabled = true; // Disable the button if sold out
+               // button.textContent = 'Sold Out'; // Change the button text
+               // button.classList.add('disabled'); // Optionally add a disabled class for styling
+                 button.addEventListener('click', function () {
+                    buyNow(button.getAttribute('data-id')); // Call the buyNow function
+                });
             } else {
                 button.addEventListener('click', function () {
                     buyNow(button.getAttribute('data-id')); // Call the buyNow function

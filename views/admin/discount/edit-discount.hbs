@@ -95,7 +95,7 @@
                             <input type="radio" id="display" name="offerVisibility" value="display" {{#if (eq discount.offerVisibility "display")}}checked{{/if}}>
                             <label for="display">Display</label>
                         </div>
-                    </form>
+                    
                 </div>
             </div>
         </div>
@@ -127,12 +127,12 @@
 
 </main><!-- End #main -->
 
-<script>
+{{!-- <script>
     document.getElementById("estcost").addEventListener("input", function () {
         let estCost = parseFloat(this.value) || 0; // Get the entered value and ensure it's a number
         document.getElementById("advcost").value = Math.round(estCost * 0.5); // Set 50% of the value without decimals
     });
-</script>
+</script> --}}
 
 <script>
     function viewImage(event) {

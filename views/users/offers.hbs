@@ -68,6 +68,7 @@
 
            <div class="row gy-4">
     {{#each offers}}
+    {{#if (eq this.offerVisibility "display" )}}
     <div class="col-lg-6 content mb-4">
         <img src="/images/discounts-images/{{this._id}}.png" class="img-fluid about-img" alt="" style="height:600px">
         <br><br>
@@ -75,7 +76,7 @@
 
         <p>{{this.desc}}</p>
         
-        <p>Use this code to get discount when checkout <h6>{{this.subname}}</h6></p>
+        <p>Use this code to get discount when checkout on <strong>{{this.subname}}</strong></p>
 
         <section class="content">
             <div class="coupon-wrapper">
@@ -88,6 +89,7 @@
 
         <a href="/single-room-offer/{{this.subname}}" class="btn btn-dark btn-sm">Learn More +</a>
     </div>
+    {{/if}}
     {{/each}}
 </div>
 
